@@ -9,7 +9,6 @@
   border: 1px solid var(--magwalk-line);
   border-radius: 8px;
   background: rgba(5, 7, 11, 0.5);
-  backdrop-filter: blur(14px);
   padding: 28px;
 }
 

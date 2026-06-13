@@ -79,6 +79,8 @@
   let geolocationPermissionStatus = null;
   let loadedHistoryLogs = [];
   let renderedHistoryCount = 0;
+  let historyRequestId = 0;
+  let historyAbortController = null;
   let activeFilter = {
     from: null,
     to: null,
@@ -246,6 +248,13 @@
   function updatePresetButtons() {
     presetButtons.forEach((button) => {
       button.classList.toggle('is-active', button.dataset.rangePreset === activeFilter.preset);
+    });
+  }
+
+  function setFilterControlsLoading(isLoading) {
+    [...presetButtons, applyFilterButton, clearFilterButton].forEach((button) => {
+      button.disabled = isLoading;
+      button.classList.toggle('is-loading', isLoading);
     });
   }
 
@@ -536,6 +545,25 @@
     }
   }
 
+  function fitMapToPath() {
+    if (!mapState.map || !mapState.coordinates.length) {
+      return;
+    }
+
+    resizeMap();
+
+    if (mapState.coordinates.length === 1) {
+      mapState.map.setCenter(mapState.coordinates[0]);
+      return;
+    }
+
+    const bounds = mapState.coordinates.reduce(
+      (nextBounds, coordinate) => nextBounds.extend(coordinate),
+      new maplibregl.LngLatBounds(mapState.coordinates[0], mapState.coordinates[0])
+    );
+    mapState.map.fitBounds(bounds, { padding: 32, duration: 0 });
+  }
+
   function initMap(center = DEFAULT_CENTER) {
     if (mapState.map) {
       resizeMap();
@@ -604,23 +632,47 @@
     mapState.marker.setLngLat(lngLat);
     updatePathLayer();
     updatePathCount();
-    resizeMap();
 
     if (shouldPan) {
+      resizeMap();
       mapState.map.easeTo({ center: lngLat, duration: 700 });
       return;
     }
 
-    if (mapState.coordinates.length > 1) {
-      const bounds = mapState.coordinates.reduce(
-        (nextBounds, coordinate) => nextBounds.extend(coordinate),
-        new maplibregl.LngLatBounds(mapState.coordinates[0], mapState.coordinates[0])
-      );
-      mapState.map.fitBounds(bounds, { padding: 32, duration: 0 });
+    resizeMap();
+  }
+
+  function setMapLocations(locations) {
+    if (!mapState.map) {
+      initMap();
+    }
+
+    if (!mapState.map) {
       return;
     }
 
-    mapState.map.setCenter(lngLat);
+    mapState.coordinates = locations
+      .map((location) => {
+        const latitudeValue = Number(location.latitude);
+        const longitudeValue = Number(location.longitude);
+
+        if (!Number.isFinite(latitudeValue) || !Number.isFinite(longitudeValue)) {
+          return null;
+        }
+
+        return [longitudeValue, latitudeValue];
+      })
+      .filter(Boolean);
+
+    const lastCoordinate = mapState.coordinates[mapState.coordinates.length - 1];
+
+    if (lastCoordinate) {
+      mapState.marker.setLngLat(lastCoordinate);
+    }
+
+    updatePathLayer();
+    updatePathCount();
+    fitMapToPath();
   }
 
   function formatHistoryLog(location, label) {
@@ -663,31 +715,57 @@
   }
 
   async function loadLocationHistory() {
-    const response = await fetch(`/api/location?${buildLocationQuery()}`);
+    const requestId = historyRequestId + 1;
+    historyRequestId = requestId;
 
-    if (!response.ok) {
-      setStatus('Failed to load filtered location history.');
-      return;
+    if (historyAbortController) {
+      historyAbortController.abort();
     }
 
-    clearRenderedHistory();
-    const logs = await response.json();
-    loadedHistoryLogs = logs;
+    historyAbortController = new AbortController();
+    setFilterControlsLoading(true);
 
-    logs
-      .slice()
-      .reverse()
-      .forEach((location) => {
-        addLocationToMap(location, false);
+    try {
+      const response = await fetch(`/api/location?${buildLocationQuery()}`, {
+        signal: historyAbortController.signal,
       });
 
-    renderNextHistoryPage();
-    setStatus(
-      `Map path loaded: ${logs.length} records. History displays ${Math.min(
-        renderedHistoryCount,
-        logs.length
-      )} records.`
-    );
+      if (requestId !== historyRequestId) {
+        return;
+      }
+
+      if (!response.ok) {
+        setStatus('Failed to load filtered location history.');
+        return;
+      }
+
+      clearRenderedHistory();
+      const logs = await response.json();
+
+      if (requestId !== historyRequestId) {
+        return;
+      }
+
+      loadedHistoryLogs = logs;
+      setMapLocations(logs.slice().reverse());
+
+      renderNextHistoryPage();
+      setStatus(
+        `Map path loaded: ${logs.length} records. History displays ${Math.min(
+          renderedHistoryCount,
+          logs.length
+        )} records.`
+      );
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        setStatus(`Failed to load filtered location history: ${error.message}`);
+      }
+    } finally {
+      if (requestId === historyRequestId) {
+        setFilterControlsLoading(false);
+        historyAbortController = null;
+      }
+    }
   }
 
   async function loadCurrentUser() {

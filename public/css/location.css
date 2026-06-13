@@ -182,10 +182,19 @@
   padding: 0 12px;
 }
 
+.filter-chip:disabled {
+  cursor: progress;
+  opacity: 0.58;
+}
+
 .filter-chip.is-active,
 .filter-chip:hover {
   border-color: rgba(255, 255, 255, 0.7);
   background: rgba(255, 255, 255, 0.14);
+}
+
+.filter-chip.is-loading {
+  opacity: 0.58;
 }
 
 .filter-custom {
@@ -423,16 +432,43 @@
   background: rgba(255, 255, 255, 0.14);
 }
 
-.modal-content {
+.history-modal-dialog {
+  width: min(760px, calc(100% - 24px));
+  max-width: 760px;
+  margin: max(16px, env(safe-area-inset-top)) auto max(20px, env(safe-area-inset-bottom));
+}
+
+.history-modal-dialog .modal-content {
+  max-height: min(760px, calc(100dvh - max(32px, env(safe-area-inset-top)) - max(56px, env(safe-area-inset-bottom))));
   border: 1px solid var(--magwalk-line);
   border-radius: 8px;
   background: rgba(5, 7, 11, 0.5);
-  backdrop-filter: blur(12px);
+}
+
+.history-modal-dialog .modal-body {
+  overflow: auto;
 }
 
 .modal-header {
   align-items: flex-start;
   border-bottom-color: var(--magwalk-line);
+}
+
+.modal-backdrop.show {
+  opacity: 0.5;
+}
+
+.maplibregl-popup-content {
+  background: #f8fafc;
+  color: #05070b;
+  font-weight: 800;
+}
+
+.maplibregl-popup-tip {
+  border-top-color: #f8fafc;
+  border-bottom-color: #f8fafc;
+  border-left-color: #f8fafc;
+  border-right-color: #f8fafc;
 }
 
 body.touch-guard-active {
@@ -459,7 +495,7 @@ body.touch-guard-active {
   width: min(360px, 100%);
   border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: 8px;
-  background: rgba(5, 7, 11, 0.86);
+  background: rgba(5, 7, 11, 0.5);
   color: var(--magwalk-ink);
   padding: 22px;
   text-align: center;
@@ -582,6 +618,15 @@ body.touch-guard-active {
   .location-map {
     height: 62vh;
     min-height: 420px;
+  }
+
+  .history-modal-dialog {
+    width: min(560px, calc(100% - 20px));
+    margin-block: max(12px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-bottom));
+  }
+
+  .history-modal-dialog .modal-content {
+    max-height: calc(100dvh - max(24px, env(safe-area-inset-top)) - max(48px, env(safe-area-inset-bottom)));
   }
 }
 

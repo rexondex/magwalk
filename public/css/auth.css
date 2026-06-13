@@ -11,7 +11,6 @@
   margin: 0 auto;
   border: 1px solid var(--magwalk-line);
   background: rgba(5, 7, 11, 0.5);
-  backdrop-filter: blur(14px);
 }
 
 .auth-form {
