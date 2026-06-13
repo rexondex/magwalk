@@ -630,12 +630,6 @@ body.touch-guard-active {
     height: 17px;
   }
 
-  .account-bar .btn {
-    min-height: 34px;
-    padding: 0 10px;
-    white-space: nowrap;
-  }
-
   .dashboard-toggle {
     margin-top: 8px;
   }
@@ -724,11 +718,6 @@ body.touch-guard-active {
   .account-chip {
     max-width: 18vw;
     font-size: 11px;
-    padding-inline: 8px;
-  }
-
-  .account-bar .btn {
-    font-size: 12px;
     padding-inline: 8px;
   }
 
