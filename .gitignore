@@ -1,0 +1,65 @@
+# ==========================================
+# 종속성 (Dependencies)
+# ==========================================
+# Node.js 패키지 폴더 (절대 깃허브에 올리면 안 됨)
+node_modules/
+jspm_packages/
+web_modules/
+
+# ==========================================
+# 환경 변수 및 보안 (Secrets & Environments)
+# ==========================================
+# API 키, 데이터베이스 비밀번호 등이 포함된 파일
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# ==========================================
+# 빌드 및 산출물 (Build outputs)
+# ==========================================
+# 프론트엔드 빌드 결과물 폴더 (선택 사항)
+dist/
+build/
+out/
+.next/
+
+# ==========================================
+# 로그 및 런타임 파일 (Logs & Runtimes)
+# ==========================================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# PM2 등 프로세스 매니저 로그
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# ==========================================
+# OS 및 IDE 설정 파일 (System files)
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE (VS Code, WebStorm 등)
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
