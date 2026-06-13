@@ -3,6 +3,31 @@
   const DEFAULT_ZOOM = 13;
   const PATH_SOURCE_ID = 'magwalk-location-path-source';
   const PATH_LAYER_ID = 'magwalk-location-path-layer';
+  const BASEMAP_STYLE = {
+    version: 8,
+    sources: {
+      carto: {
+        type: 'raster',
+        tiles: [
+          'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+          'https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+          'https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+          'https://d.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+        ],
+        tileSize: 256,
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      },
+    },
+    layers: [
+      {
+        id: 'carto-basemap',
+        type: 'raster',
+        source: 'carto',
+        minzoom: 0,
+        maxzoom: 20,
+      },
+    ],
+  };
 
   const permissionButton = document.querySelector('#permissionButton');
   const startButton = document.querySelector('#startButton');
@@ -55,6 +80,13 @@
   }
 
   function pathGeoJson() {
+    if (mapState.coordinates.length < 2) {
+      return {
+        type: 'FeatureCollection',
+        features: [],
+      };
+    }
+
     return {
       type: 'Feature',
       properties: {},
@@ -71,8 +103,23 @@
     }
 
     mapState.map.resize();
+    mapState.map.triggerRepaint();
     window.requestAnimationFrame(() => mapState.map?.resize());
     window.setTimeout(() => mapState.map?.resize(), 100);
+    window.setTimeout(() => mapState.map?.resize(), 300);
+  }
+
+  function mapSizeText() {
+    const container = document.querySelector('#locationMap');
+    const canvas = container?.querySelector('canvas');
+
+    if (!container) {
+      return 'map container missing';
+    }
+
+    return `container ${container.clientWidth}x${container.clientHeight}, canvas ${
+      canvas?.clientWidth || 0
+    }x${canvas?.clientHeight || 0}`;
   }
 
   function ensurePathLayer() {
@@ -127,9 +174,15 @@
 
     mapState.map = new maplibregl.Map({
       container: 'locationMap',
-      style: 'https://demotiles.maplibre.org/style.json',
+      style: BASEMAP_STYLE,
       center,
       zoom: DEFAULT_ZOOM,
+      attributionControl: true,
+    });
+
+    mapState.map.on('error', (event) => {
+      const message = event?.error?.message || 'MapLibre map failed to load.';
+      setStatus(`Map error: ${message}`);
     });
 
     mapState.map.addControl(new maplibregl.NavigationControl(), 'top-right');
@@ -142,6 +195,10 @@
     mapState.map.on('load', () => {
       ensurePathLayer();
       resizeMap();
+      window.setTimeout(() => {
+        resizeMap();
+        setStatus(`Map loaded. ${mapSizeText()}`);
+      }, 100);
     });
 
     resizeMap();
