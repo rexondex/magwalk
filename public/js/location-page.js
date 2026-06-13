@@ -1,6 +1,6 @@
 (function () {
   const DEFAULT_CENTER = [127.0276, 37.4979];
-  const DEFAULT_ZOOM = 11;
+  const DEFAULT_ZOOM = 9;
   const MAP_HISTORY_LIMIT = 50000;
   const HISTORY_PAGE_SIZE = 300;
   const HEALTH_CHECK_INTERVAL_MS = 5000;
