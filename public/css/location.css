@@ -16,6 +16,37 @@
   gap: 10px;
 }
 
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(76px, 1fr));
+  gap: 10px;
+}
+
+.action-button {
+  min-height: 78px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  padding: 10px 8px;
+}
+
+.action-button svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.action-button span {
+  font-size: 12px;
+  line-height: 1;
+}
+
 .metric {
   border: 0;
 }
@@ -93,9 +124,18 @@
   color: #475569;
 }
 
+.modal-content {
+  border: 0;
+  border-radius: 8px;
+}
+
+.modal-header {
+  align-items: flex-start;
+}
+
 @media (max-width: 720px) {
   .app-shell {
-    padding: 20px 10px;
+    padding: 12px 10px 20px;
   }
 
   .topbar,
@@ -105,7 +145,40 @@
     flex-direction: column;
   }
 
+  .card-body {
+    padding: 18px !important;
+  }
+
+  .action-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .action-button {
+    min-height: 72px;
+    padding: 8px 4px;
+  }
+
+  .action-button svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .metric .card-body {
+    padding: 14px !important;
+  }
+
+  .metric strong {
+    font-size: 16px;
+  }
+
   .location-map {
     height: 420px;
+  }
+}
+
+@media (max-width: 380px) {
+  .action-button span {
+    font-size: 11px;
   }
 }

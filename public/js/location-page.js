@@ -41,6 +41,7 @@
   const collectedAt = document.querySelector('#collectedAt');
   const lastCommit = document.querySelector('#lastCommit');
   const locationLog = document.querySelector('#locationLog');
+  const historyEmpty = document.querySelector('#historyEmpty');
   const pathCount = document.querySelector('#pathCount');
 
   const mapState = {
@@ -65,6 +66,10 @@
   }
 
   function appendLog(text, className) {
+    if (historyEmpty) {
+      historyEmpty.hidden = true;
+    }
+
     const item = document.createElement('li');
     item.textContent = text;
     item.classList.add('list-group-item');

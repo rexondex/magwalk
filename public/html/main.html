@@ -29,20 +29,45 @@
             </div>
           </div>
 
-          <div class="btn-toolbar mt-4" role="toolbar" aria-label="Location collection controls">
-            <div class="btn-group flex-wrap gap-2" role="group">
-              <button id="permissionButton" class="btn btn-primary" type="button">Permission</button>
-              <button id="startButton" class="btn btn-success" type="button">Collect ON</button>
-              <button id="stopButton" class="btn btn-outline-danger" type="button" disabled>
-                Collect OFF
-              </button>
-            </div>
+          <div class="action-grid mt-4" role="toolbar" aria-label="Location collection controls">
+            <button id="permissionButton" class="action-button btn btn-primary" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M12 21s7-6.1 7-12a7 7 0 0 0-14 0c0 5.9 7 12 7 12z"></path>
+                <circle cx="12" cy="9" r="2.5"></circle>
+              </svg>
+              <span>Permit</span>
+            </button>
+            <button id="startButton" class="action-button btn btn-success" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"></path>
+              </svg>
+              <span>Start</span>
+            </button>
+            <button id="stopButton" class="action-button btn btn-outline-danger" type="button" disabled>
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <rect x="7" y="7" width="10" height="10" rx="1"></rect>
+              </svg>
+              <span>Stop</span>
+            </button>
+            <button
+              class="action-button btn btn-outline-secondary"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#historyModal"
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M4 5h16"></path>
+                <path d="M4 12h16"></path>
+                <path d="M4 19h16"></path>
+              </svg>
+              <span>History</span>
+            </button>
           </div>
         </div>
       </section>
 
       <section class="row g-3 mb-4" aria-live="polite">
-        <div class="col-12 col-md">
+        <div class="col-6 col-md">
           <div class="metric card h-100 shadow-sm">
             <div class="card-body">
               <span>Latitude</span>
@@ -50,7 +75,7 @@
             </div>
           </div>
         </div>
-        <div class="col-12 col-md">
+        <div class="col-6 col-md">
           <div class="metric card h-100 shadow-sm">
             <div class="card-body">
               <span>Longitude</span>
@@ -58,7 +83,7 @@
             </div>
           </div>
         </div>
-        <div class="col-12 col-md">
+        <div class="col-6 col-md">
           <div class="metric card h-100 shadow-sm">
             <div class="card-body">
               <span>Accuracy</span>
@@ -66,7 +91,7 @@
             </div>
           </div>
         </div>
-        <div class="col-12 col-md">
+        <div class="col-6 col-md">
           <div class="metric card h-100 shadow-sm">
             <div class="card-body">
               <span>Collected At</span>
@@ -94,12 +119,23 @@
         </div>
       </section>
 
-      <section class="card border-0 shadow-sm">
-        <div class="card-body p-4">
-          <h2 class="h4 fw-bold">Location Log</h2>
-          <ol id="locationLog" class="location-log list-group list-group-numbered"></ol>
+      <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+          <div class="modal-content">
+            <div class="modal-header">
+              <div>
+                <p class="eyebrow mb-1">Magwalk</p>
+                <h2 class="modal-title h5 fw-bold" id="historyModalTitle">Location History</h2>
+              </div>
+              <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p id="historyEmpty" class="text-secondary mb-0">No location history yet.</p>
+              <ol id="locationLog" class="location-log list-group list-group-numbered"></ol>
+            </div>
+          </div>
         </div>
-      </section>
+      </div>
     </main>
 
     <script src="/vendor/maplibre-gl/maplibre-gl.js?v=local"></script>
