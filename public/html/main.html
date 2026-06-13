@@ -16,9 +16,6 @@
           <div>
             <p class="eyebrow">Magwalk</p>
             <h1 class="h2 fw-bold mb-1">Location Collector</h1>
-            <p id="permissionStatus" class="status-text mb-0">
-              Waiting for browser location permission.
-            </p>
           </div>
           <div class="account-bar">
             <span class="account-chip" id="accountName">-</span>
@@ -60,37 +57,56 @@
             <span>History</span>
           </button>
         </div>
+
+        <button
+          class="dashboard-toggle"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#dashboardPanel"
+          aria-expanded="false"
+          aria-controls="dashboardPanel"
+        >
+          <span>Dashboard</span>
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="m6 9 6 6 6-6"></path>
+          </svg>
+        </button>
       </section>
 
-      <section class="metric-grid" aria-live="polite">
-        <div class="col-6 col-md">
-          <div class="metric">
-            <span>Latitude</span>
-            <strong id="latitude">-</strong>
+      <section id="dashboardPanel" class="dashboard-panel collapse" aria-live="polite">
+        <p id="permissionStatus" class="status-text">
+          Waiting for browser location permission.
+        </p>
+        <div class="metric-grid">
+          <div>
+            <div class="metric">
+              <span>Latitude</span>
+              <strong id="latitude">-</strong>
+            </div>
           </div>
-        </div>
-        <div class="col-6 col-md">
-          <div class="metric">
-            <span>Longitude</span>
-            <strong id="longitude">-</strong>
+          <div>
+            <div class="metric">
+              <span>Longitude</span>
+              <strong id="longitude">-</strong>
+            </div>
           </div>
-        </div>
-        <div class="col-6 col-md">
-          <div class="metric">
-            <span>Accuracy</span>
-            <strong id="accuracy">-</strong>
+          <div>
+            <div class="metric">
+              <span>Accuracy</span>
+              <strong id="accuracy">-</strong>
+            </div>
           </div>
-        </div>
-        <div class="col-6 col-md">
-          <div class="metric">
-            <span>Collected At</span>
-            <strong id="collectedAt">-</strong>
+          <div>
+            <div class="metric">
+              <span>Collected At</span>
+              <strong id="collectedAt">-</strong>
+            </div>
           </div>
-        </div>
-        <div class="col-12 col-md">
-          <div class="metric">
-            <span>Last Commit</span>
-            <strong id="lastCommit">-</strong>
+          <div>
+            <div class="metric">
+              <span>Last Commit</span>
+              <strong id="lastCommit">-</strong>
+            </div>
           </div>
         </div>
       </section>

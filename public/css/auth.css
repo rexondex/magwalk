@@ -32,8 +32,8 @@
 }
 
 .form-control:focus {
-  border-color: var(--magwalk-blue);
+  border-color: var(--magwalk-accent);
   background: #070a10;
   color: var(--magwalk-ink);
-  box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.12);
+  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.12);
 }

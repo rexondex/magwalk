@@ -4,10 +4,9 @@
   --magwalk-surface-2: #111827;
   --magwalk-line: rgba(148, 163, 184, 0.18);
   --magwalk-ink: #f8fafc;
-  --magwalk-muted: #94a3b8;
-  --magwalk-blue: #38bdf8;
-  --magwalk-green: #22c55e;
-  --magwalk-red: #fb7185;
+  --magwalk-muted: #9ca3af;
+  --magwalk-accent: #ffffff;
+  --magwalk-soft: rgba(255, 255, 255, 0.08);
 }
 
 * {
@@ -21,16 +20,14 @@ html {
 body {
   min-height: 100vh;
   margin: 0;
-  background:
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 24rem),
-    linear-gradient(180deg, #070a10 0%, var(--magwalk-bg) 100%);
+  background: linear-gradient(180deg, #090909 0%, var(--magwalk-bg) 100%);
   color: var(--magwalk-ink);
   font-family: Arial, sans-serif;
 }
 
 .eyebrow {
   margin: 0 0 8px;
-  color: var(--magwalk-blue);
+  color: var(--magwalk-ink);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0;
@@ -54,10 +51,12 @@ body {
 }
 
 .btn-primary {
-  --bs-btn-bg: #2563eb;
-  --bs-btn-border-color: #2563eb;
-  --bs-btn-hover-bg: #1d4ed8;
-  --bs-btn-hover-border-color: #1d4ed8;
+  --bs-btn-bg: #f8fafc;
+  --bs-btn-border-color: #f8fafc;
+  --bs-btn-color: #05070b;
+  --bs-btn-hover-bg: #e5e7eb;
+  --bs-btn-hover-border-color: #e5e7eb;
+  --bs-btn-hover-color: #05070b;
 }
 
 .btn-dark-ghost {
@@ -67,7 +66,7 @@ body {
 }
 
 .btn-dark-ghost:hover {
-  border-color: rgba(248, 250, 252, 0.35);
+  border-color: rgba(248, 250, 252, 0.42);
   background: rgba(255, 255, 255, 0.08);
   color: var(--magwalk-ink);
 }

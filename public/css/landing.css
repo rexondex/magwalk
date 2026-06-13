@@ -30,8 +30,8 @@
   content: "";
   position: absolute;
   inset: 36px 34px 42px;
-  border-bottom: 5px solid var(--magwalk-green);
-  border-left: 5px solid var(--magwalk-green);
+  border-bottom: 5px solid var(--magwalk-ink);
+  border-left: 5px solid var(--magwalk-ink);
   border-radius: 0 0 0 72px;
   transform: skewX(-12deg);
 }
@@ -41,8 +41,8 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--magwalk-green);
-  box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.14);
+  background: var(--magwalk-ink);
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.12);
 }
 
 .route-preview span:nth-child(1) {
@@ -64,6 +64,6 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--magwalk-green);
-  box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.14);
+  background: var(--magwalk-ink);
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.12);
 }

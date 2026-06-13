@@ -9,10 +9,10 @@
       carto: {
         type: 'raster',
         tiles: [
-          'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-          'https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-          'https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-          'https://d.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+          'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+          'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+          'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+          'https://d.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
         ],
         tileSize: 256,
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
@@ -150,7 +150,7 @@
           'line-join': 'round',
         },
         paint: {
-          'line-color': '#16a34a',
+          'line-color': '#f8fafc',
           'line-opacity': 0.95,
           'line-width': 5,
         },
@@ -193,7 +193,7 @@
 
     mapState.map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
-    mapState.marker = new maplibregl.Marker({ color: '#ef4444' })
+    mapState.marker = new maplibregl.Marker({ color: '#f8fafc' })
       .setLngLat(center)
       .setPopup(new maplibregl.Popup().setHTML('<strong>Current location</strong>'))
       .addTo(mapState.map);
