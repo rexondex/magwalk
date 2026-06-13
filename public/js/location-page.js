@@ -1,6 +1,6 @@
 (function () {
   const DEFAULT_CENTER = [127.0276, 37.4979];
-  const DEFAULT_ZOOM = 13;
+  const DEFAULT_ZOOM = 11;
   const PATH_SOURCE_ID = 'magwalk-location-path-source';
   const PATH_LAYER_ID = 'magwalk-location-path-layer';
   const BASEMAP_STYLE = {
