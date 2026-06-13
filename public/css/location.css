@@ -43,6 +43,33 @@
   white-space: nowrap;
 }
 
+.icon-button {
+  width: 38px;
+  height: 38px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--magwalk-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--magwalk-ink);
+}
+
+.icon-button svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.icon-button:hover {
+  border-color: rgba(248, 250, 252, 0.42);
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .action-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -398,6 +425,17 @@
   color: #d1d5db;
 }
 
+.notice-log {
+  margin-bottom: 0;
+}
+
+.notice-log li {
+  border-color: var(--magwalk-line);
+  background: #0a0a0a;
+  color: #d1d5db;
+  line-height: 1.5;
+}
+
 .load-more-history {
   width: 100%;
   min-height: 44px;
@@ -452,6 +490,24 @@
   border-top-color: var(--magwalk-line);
   background: rgba(5, 7, 11, 0.5);
   padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.notice-modal-dialog {
+  width: min(620px, calc(100% - 24px));
+  max-width: 620px;
+  margin: max(16px, env(safe-area-inset-top)) auto max(20px, env(safe-area-inset-bottom));
+}
+
+.notice-modal-dialog .modal-content {
+  max-height: min(680px, calc(100dvh - max(32px, env(safe-area-inset-top)) - max(56px, env(safe-area-inset-bottom))));
+  border: 1px solid var(--magwalk-line);
+  border-radius: 8px;
+  background: rgba(5, 7, 11, 0.5);
+}
+
+.notice-modal-dialog .modal-body {
+  min-height: 180px;
+  overflow: auto;
 }
 
 .modal-header {
@@ -631,6 +687,15 @@ body.touch-guard-active {
   }
 
   .history-modal-dialog .modal-content {
+    max-height: calc(100dvh - max(24px, env(safe-area-inset-top)) - max(48px, env(safe-area-inset-bottom)));
+  }
+
+  .notice-modal-dialog {
+    width: min(560px, calc(100% - 20px));
+    margin-block: max(12px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-bottom));
+  }
+
+  .notice-modal-dialog .modal-content {
     max-height: calc(100dvh - max(24px, env(safe-area-inset-top)) - max(48px, env(safe-area-inset-bottom)));
   }
 }

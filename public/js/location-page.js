@@ -43,6 +43,8 @@
   const touchGuardButton = document.querySelector('#touchGuardButton');
   const signoutButton = document.querySelector('#signoutButton');
   const permissionStatus = document.querySelector('#permissionStatus');
+  const noticeLog = document.querySelector('#noticeLog');
+  const noticeLogEmpty = document.querySelector('#noticeLogEmpty');
   const accountName = document.querySelector('#accountName');
   const latitude = document.querySelector('#latitude');
   const longitude = document.querySelector('#longitude');
@@ -72,6 +74,7 @@
   };
 
   const wakeLockReasons = new Set();
+  const noticeMessages = [];
   let wakeLockSentinel = null;
   let unlockExpectedStep = 1;
   let healthTimerId = null;
@@ -124,8 +127,41 @@
     locationLog.prepend(item);
   }
 
+  function appendNotice(message) {
+    if (!message) {
+      return;
+    }
+
+    noticeMessages.unshift({
+      message,
+      createdAt: new Date(),
+    });
+
+    if (noticeMessages.length > 300) {
+      noticeMessages.pop();
+    }
+
+    if (noticeLogEmpty) {
+      noticeLogEmpty.hidden = noticeMessages.length > 0;
+    }
+
+    if (!noticeLog) {
+      return;
+    }
+
+    const item = document.createElement('li');
+    item.classList.add('list-group-item');
+    item.textContent = `${formatTime(noticeMessages[0].createdAt)} | ${message}`;
+    noticeLog.prepend(item);
+
+    while (noticeLog.children.length > 300) {
+      noticeLog.lastElementChild?.remove();
+    }
+  }
+
   function setStatus(message) {
     permissionStatus.textContent = message;
+    appendNotice(message);
   }
 
   function setRunningIndicator(isRunning) {
@@ -940,6 +976,7 @@
   }
 
   bootMapAfterLayout();
+  appendNotice(permissionStatus.textContent.trim());
   refreshUnlockSteps();
   populateHourSelects();
   updatePresetButtons();
