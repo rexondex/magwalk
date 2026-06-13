@@ -1,6 +1,7 @@
 (function () {
   const DEFAULT_CENTER = [127.0276, 37.4979];
-  const DEFAULT_ZOOM = 11;
+  const DEFAULT_ZOOM = 17;
+  const MAX_FIT_BOUNDS_ZOOM = 17;
   const MAP_HISTORY_LIMIT = 50000;
   const HISTORY_PAGE_SIZE = 300;
   const HEALTH_CHECK_INTERVAL_MS = 5000;
@@ -602,7 +603,7 @@
       (nextBounds, coordinate) => nextBounds.extend(coordinate),
       new maplibregl.LngLatBounds(mapState.coordinates[0], mapState.coordinates[0])
     );
-    mapState.map.fitBounds(bounds, { padding: 32, duration: 0 });
+    mapState.map.fitBounds(bounds, { padding: 32, duration: 0, maxZoom: MAX_FIT_BOUNDS_ZOOM });
   }
 
   function initMap(center = DEFAULT_CENTER) {
