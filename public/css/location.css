@@ -144,6 +144,12 @@
   padding: 0 14px;
 }
 
+.dashboard-toggle[aria-expanded="true"] {
+  border-color: #f8fafc;
+  background: #f8fafc;
+  color: #05070b;
+}
+
 .dashboard-toggle svg {
   width: 18px;
   height: 18px;
@@ -152,6 +158,11 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2;
+  transition: transform 0.18s ease;
+}
+
+.dashboard-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
 }
 
 .dashboard-panel {
