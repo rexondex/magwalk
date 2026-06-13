@@ -59,19 +59,17 @@
     longitude.textContent = formatNumber(location.longitude);
     accuracy.textContent = formatAccuracy(location.accuracy);
     collectedAt.textContent = formatTime(location.collectedAt);
-
-    appendLog(
-      `${formatTime(location.collectedAt)} | collected | lat ${formatNumber(
-        location.latitude
-      )}, lng ${formatNumber(location.longitude)}, accuracy ${formatAccuracy(location.accuracy)}`,
-      'collected'
-    );
   }
 
   function renderSaved(result) {
     const savedAt = result.collectedAt || new Date();
     lastCommit.textContent = formatTime(savedAt);
-    appendLog(`${formatTime(savedAt)} | DB committed`, 'saved');
+    appendLog(
+      `${formatTime(savedAt)} | DB committed | lat ${formatNumber(result.latitude)}, lng ${formatNumber(
+        result.longitude
+      )}, accuracy ${formatAccuracy(result.accuracy)}`,
+      'saved'
+    );
     setStatus('DB committed.');
   }
 
