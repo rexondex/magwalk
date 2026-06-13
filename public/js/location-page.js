@@ -5,6 +5,10 @@
   const HEALTH_TIMEOUT_MS = 45000;
   const PATH_SOURCE_ID = 'magwalk-location-path-source';
   const PATH_LAYER_ID = 'magwalk-location-path-layer';
+  const START_POINT_SOURCE_ID = 'magwalk-location-start-point-source';
+  const START_POINT_LAYER_ID = 'magwalk-location-start-point-layer';
+  const END_POINT_SOURCE_ID = 'magwalk-location-end-point-source';
+  const END_POINT_LAYER_ID = 'magwalk-location-end-point-layer';
   const BASEMAP_STYLE = {
     version: 8,
     sources: {
@@ -364,6 +368,24 @@
     };
   }
 
+  function pointGeoJson(coordinate) {
+    if (!coordinate) {
+      return {
+        type: 'FeatureCollection',
+        features: [],
+      };
+    }
+
+    return {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'Point',
+        coordinates: coordinate,
+      },
+    };
+  }
+
   function resizeMap() {
     if (!mapState.map) {
       return;
@@ -417,14 +439,72 @@
         },
       });
     }
+
+    if (!mapState.map.getSource(START_POINT_SOURCE_ID)) {
+      mapState.map.addSource(START_POINT_SOURCE_ID, {
+        type: 'geojson',
+        data: pointGeoJson(mapState.coordinates[0]),
+      });
+    }
+
+    if (!mapState.map.getLayer(START_POINT_LAYER_ID)) {
+      mapState.map.addLayer({
+        id: START_POINT_LAYER_ID,
+        type: 'circle',
+        source: START_POINT_SOURCE_ID,
+        paint: {
+          'circle-color': '#22d3ee',
+          'circle-radius': 8,
+          'circle-stroke-color': '#05070b',
+          'circle-stroke-width': 3,
+        },
+      });
+    }
+
+    if (!mapState.map.getSource(END_POINT_SOURCE_ID)) {
+      mapState.map.addSource(END_POINT_SOURCE_ID, {
+        type: 'geojson',
+        data: pointGeoJson(
+          mapState.coordinates.length > 1 ? mapState.coordinates[mapState.coordinates.length - 1] : null
+        ),
+      });
+    }
+
+    if (!mapState.map.getLayer(END_POINT_LAYER_ID)) {
+      mapState.map.addLayer({
+        id: END_POINT_LAYER_ID,
+        type: 'circle',
+        source: END_POINT_SOURCE_ID,
+        paint: {
+          'circle-color': '#d946ef',
+          'circle-radius': 8,
+          'circle-stroke-color': '#05070b',
+          'circle-stroke-width': 3,
+        },
+      });
+    }
   }
 
   function updatePathLayer() {
     ensurePathLayer();
     const source = mapState.map?.getSource(PATH_SOURCE_ID);
+    const startSource = mapState.map?.getSource(START_POINT_SOURCE_ID);
+    const endSource = mapState.map?.getSource(END_POINT_SOURCE_ID);
 
     if (source) {
       source.setData(pathGeoJson());
+    }
+
+    if (startSource) {
+      startSource.setData(pointGeoJson(mapState.coordinates[0]));
+    }
+
+    if (endSource) {
+      endSource.setData(
+        pointGeoJson(
+          mapState.coordinates.length > 1 ? mapState.coordinates[mapState.coordinates.length - 1] : null
+        )
+      );
     }
   }
 
