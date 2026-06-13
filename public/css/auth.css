@@ -9,7 +9,8 @@
   max-width: 460px;
   width: 100%;
   margin: 0 auto;
-  border: 1px solid rgba(148, 163, 184, 0.28);
+  border: 1px solid var(--magwalk-line);
+  background: rgba(11, 15, 22, 0.88);
 }
 
 .auth-form {
@@ -18,17 +19,21 @@
 }
 
 .form-label {
-  color: #475569;
+  color: #cbd5e1;
   font-size: 14px;
   font-weight: 700;
 }
 
 .form-control {
-  border-color: #cbd5e1;
+  border-color: var(--magwalk-line);
   border-radius: 6px;
+  background: #070a10;
+  color: var(--magwalk-ink);
 }
 
 .form-control:focus {
   border-color: var(--magwalk-blue);
-  box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.12);
+  background: #070a10;
+  color: var(--magwalk-ink);
+  box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.12);
 }

@@ -6,9 +6,9 @@
 }
 
 .landing-card {
-  border: 1px solid rgba(148, 163, 184, 0.28);
+  border: 1px solid var(--magwalk-line);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(11, 15, 22, 0.84);
   padding: 28px;
 }
 
@@ -16,12 +16,12 @@
   position: relative;
   height: 170px;
   margin-bottom: 24px;
-  border: 1px solid #dbe4ef;
+  border: 1px solid var(--magwalk-line);
   border-radius: 8px;
   background:
-    linear-gradient(90deg, rgba(15, 118, 110, 0.07) 1px, transparent 1px),
-    linear-gradient(rgba(15, 118, 110, 0.07) 1px, transparent 1px),
-    #f8fafc;
+    linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    #070a10;
   background-size: 28px 28px;
   overflow: hidden;
 }
@@ -42,7 +42,7 @@
   height: 12px;
   border-radius: 50%;
   background: var(--magwalk-green);
-  box-shadow: 0 0 0 6px rgba(22, 163, 74, 0.14);
+  box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.14);
 }
 
 .route-preview span:nth-child(1) {
@@ -65,5 +65,5 @@
   height: 12px;
   border-radius: 50%;
   background: var(--magwalk-green);
-  box-shadow: 0 0 0 6px rgba(22, 163, 74, 0.14);
+  box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.14);
 }

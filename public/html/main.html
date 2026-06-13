@@ -10,113 +10,97 @@
     <link rel="stylesheet" href="/css/location.css" />
   </head>
   <body>
-    <main class="app-shell container-fluid">
-      <section class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-          <div class="topbar">
-            <div>
-              <p class="eyebrow">Magwalk</p>
-              <h1 class="h2 fw-bold mb-1">Location Collector</h1>
-              <p id="permissionStatus" class="status-text mb-0">
-                Waiting for browser location permission.
-              </p>
-            </div>
-            <div class="account-bar">
-              <span class="badge rounded-pill text-bg-light border" id="accountName">-</span>
-              <button id="signoutButton" class="btn btn-outline-secondary" type="button">
-                Sign Out
-              </button>
-            </div>
+    <main class="app-shell">
+      <section class="app-header">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Magwalk</p>
+            <h1 class="h2 fw-bold mb-1">Location Collector</h1>
+            <p id="permissionStatus" class="status-text mb-0">
+              Waiting for browser location permission.
+            </p>
           </div>
+          <div class="account-bar">
+            <span class="account-chip" id="accountName">-</span>
+            <button id="signoutButton" class="btn btn-dark-ghost" type="button">Sign Out</button>
+          </div>
+        </div>
 
-          <div class="action-grid mt-4" role="toolbar" aria-label="Location collection controls">
-            <button id="permissionButton" class="action-button btn btn-primary" type="button">
-              <svg aria-hidden="true" viewBox="0 0 24 24">
-                <path d="M12 21s7-6.1 7-12a7 7 0 0 0-14 0c0 5.9 7 12 7 12z"></path>
-                <circle cx="12" cy="9" r="2.5"></circle>
-              </svg>
-              <span>Permit</span>
-            </button>
-            <button id="startButton" class="action-button btn btn-success" type="button">
-              <svg aria-hidden="true" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"></path>
-              </svg>
-              <span>Start</span>
-            </button>
-            <button id="stopButton" class="action-button btn btn-outline-danger" type="button" disabled>
-              <svg aria-hidden="true" viewBox="0 0 24 24">
-                <rect x="7" y="7" width="10" height="10" rx="1"></rect>
-              </svg>
-              <span>Stop</span>
-            </button>
-            <button
-              class="action-button btn btn-outline-secondary"
-              type="button"
-              data-bs-toggle="modal"
-              data-bs-target="#historyModal"
-            >
-              <svg aria-hidden="true" viewBox="0 0 24 24">
-                <path d="M4 5h16"></path>
-                <path d="M4 12h16"></path>
-                <path d="M4 19h16"></path>
-              </svg>
-              <span>History</span>
-            </button>
-          </div>
+        <div class="action-grid" role="toolbar" aria-label="Location collection controls">
+          <button id="permissionButton" class="action-button action-primary" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M12 21s7-6.1 7-12a7 7 0 0 0-14 0c0 5.9 7 12 7 12z"></path>
+              <circle cx="12" cy="9" r="2.5"></circle>
+            </svg>
+            <span>Permit</span>
+          </button>
+          <button id="startButton" class="action-button action-success" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"></path>
+            </svg>
+            <span>Start</span>
+          </button>
+          <button id="stopButton" class="action-button action-danger" type="button" disabled>
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <rect x="7" y="7" width="10" height="10" rx="1"></rect>
+            </svg>
+            <span>Stop</span>
+          </button>
+          <button
+            class="action-button action-muted"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#historyModal"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M4 5h16"></path>
+              <path d="M4 12h16"></path>
+              <path d="M4 19h16"></path>
+            </svg>
+            <span>History</span>
+          </button>
         </div>
       </section>
 
-      <section class="row g-3 mb-4" aria-live="polite">
+      <section class="metric-grid" aria-live="polite">
         <div class="col-6 col-md">
-          <div class="metric card h-100 shadow-sm">
-            <div class="card-body">
-              <span>Latitude</span>
-              <strong id="latitude">-</strong>
-            </div>
+          <div class="metric">
+            <span>Latitude</span>
+            <strong id="latitude">-</strong>
           </div>
         </div>
         <div class="col-6 col-md">
-          <div class="metric card h-100 shadow-sm">
-            <div class="card-body">
-              <span>Longitude</span>
-              <strong id="longitude">-</strong>
-            </div>
+          <div class="metric">
+            <span>Longitude</span>
+            <strong id="longitude">-</strong>
           </div>
         </div>
         <div class="col-6 col-md">
-          <div class="metric card h-100 shadow-sm">
-            <div class="card-body">
-              <span>Accuracy</span>
-              <strong id="accuracy">-</strong>
-            </div>
+          <div class="metric">
+            <span>Accuracy</span>
+            <strong id="accuracy">-</strong>
           </div>
         </div>
         <div class="col-6 col-md">
-          <div class="metric card h-100 shadow-sm">
-            <div class="card-body">
-              <span>Collected At</span>
-              <strong id="collectedAt">-</strong>
-            </div>
+          <div class="metric">
+            <span>Collected At</span>
+            <strong id="collectedAt">-</strong>
           </div>
         </div>
         <div class="col-12 col-md">
-          <div class="metric card h-100 shadow-sm">
-            <div class="card-body">
-              <span>Last Commit</span>
-              <strong id="lastCommit">-</strong>
-            </div>
+          <div class="metric">
+            <span>Last Commit</span>
+            <strong id="lastCommit">-</strong>
           </div>
         </div>
       </section>
 
-      <section class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-          <div class="map-header">
-            <h2 class="h4 fw-bold">Location Path</h2>
-            <span class="badge rounded-pill text-bg-success" id="pathCount">0 points</span>
-          </div>
-          <div id="locationMap" class="location-map" aria-label="Location path map"></div>
+      <section class="map-section">
+        <div class="map-header">
+          <h2 class="h4 fw-bold">Location Path</h2>
+          <span class="path-count" id="pathCount">0 points</span>
         </div>
+        <div id="locationMap" class="location-map" aria-label="Location path map"></div>
       </section>
 
       <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalTitle" aria-hidden="true">
