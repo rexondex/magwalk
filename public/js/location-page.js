@@ -41,8 +41,10 @@
   const accuracy = document.querySelector('#accuracy');
   const collectedAt = document.querySelector('#collectedAt');
   const lastCommit = document.querySelector('#lastCommit');
-  const filterFrom = document.querySelector('#filterFrom');
-  const filterTo = document.querySelector('#filterTo');
+  const filterFromDate = document.querySelector('#filterFromDate');
+  const filterFromHour = document.querySelector('#filterFromHour');
+  const filterToDate = document.querySelector('#filterToDate');
+  const filterToHour = document.querySelector('#filterToHour');
   const applyFilterButton = document.querySelector('#applyFilterButton');
   const clearFilterButton = document.querySelector('#clearFilterButton');
   const presetButtons = Array.from(document.querySelectorAll('[data-range-preset]'));
@@ -102,18 +104,50 @@
     permissionStatus.textContent = message;
   }
 
-  function toDatetimeLocalValue(date) {
-    const offsetMs = date.getTimezoneOffset() * 60000;
-    return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
+  function toDateInputValue(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
-  function fromDatetimeLocalValue(value) {
-    if (!value) {
+  function toHourValue(date) {
+    return String(date.getHours()).padStart(2, '0');
+  }
+
+  function fromDateHourValues(dateValue, hourValue, minute = 0, second = 0, millisecond = 0) {
+    if (!dateValue) {
       return null;
     }
 
-    const date = new Date(value);
+    const [year, month, day] = dateValue.split('-').map(Number);
+    const hour = Number(hourValue || 0);
+    const date = new Date(year, month - 1, day, hour, minute, second, millisecond);
     return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function populateHourSelects() {
+    [filterFromHour, filterToHour].forEach((select) => {
+      select.replaceChildren();
+
+      for (let hour = 0; hour < 24; hour += 1) {
+        const value = String(hour).padStart(2, '0');
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = `${value}:00`;
+        select.appendChild(option);
+      }
+    });
+
+    filterFromHour.value = '00';
+    filterToHour.value = '23';
+  }
+
+  function setFilterInputs(from, to) {
+    filterFromDate.value = from ? toDateInputValue(from) : '';
+    filterFromHour.value = from ? toHourValue(from) : '00';
+    filterToDate.value = to ? toDateInputValue(to) : '';
+    filterToHour.value = to ? toHourValue(to) : '23';
   }
 
   function presetStartDate(preset) {
@@ -517,16 +551,15 @@
         to: null,
         preset,
       };
-      filterFrom.value = toDatetimeLocalValue(activeFilter.from);
-      filterTo.value = '';
+      setFilterInputs(activeFilter.from, null);
       updatePresetButtons();
       loadLocationHistory();
     });
   });
 
   applyFilterButton.addEventListener('click', () => {
-    const from = fromDatetimeLocalValue(filterFrom.value);
-    const to = fromDatetimeLocalValue(filterTo.value);
+    const from = fromDateHourValues(filterFromDate.value, filterFromHour.value);
+    const to = fromDateHourValues(filterToDate.value, filterToHour.value, 59, 59, 999);
 
     if (from && to && from > to) {
       setStatus('Filter start time must be before end time.');
@@ -548,8 +581,7 @@
       to: null,
       preset: null,
     };
-    filterFrom.value = '';
-    filterTo.value = '';
+    setFilterInputs(null, null);
     updatePresetButtons();
     loadLocationHistory();
   });
@@ -601,6 +633,7 @@
 
   bootMapAfterLayout();
   refreshUnlockSteps();
+  populateHourSelects();
   updatePresetButtons();
   loadCurrentUser().then((isSignedIn) => {
     if (isSignedIn) {

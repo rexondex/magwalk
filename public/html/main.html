@@ -96,12 +96,20 @@
           </div>
           <div class="filter-row filter-custom">
             <label>
-              <span>From</span>
-              <input id="filterFrom" type="datetime-local" />
+              <span>From date</span>
+              <input id="filterFromDate" type="date" />
             </label>
             <label>
-              <span>To</span>
-              <input id="filterTo" type="datetime-local" />
+              <span>From time</span>
+              <select id="filterFromHour"></select>
+            </label>
+            <label>
+              <span>To date</span>
+              <input id="filterToDate" type="date" />
+            </label>
+            <label>
+              <span>To time</span>
+              <select id="filterToHour"></select>
             </label>
             <div class="filter-actions">
               <button id="applyFilterButton" class="filter-chip" type="button">Apply</button>

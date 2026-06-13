@@ -191,7 +191,7 @@
 .filter-custom {
   align-items: end;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
 }
 
 .filter-custom label {
@@ -204,7 +204,8 @@
   text-transform: uppercase;
 }
 
-.filter-custom input {
+.filter-custom input,
+.filter-custom select {
   min-height: 36px;
   width: 100%;
   border: 1px solid var(--magwalk-line);
@@ -216,7 +217,8 @@
   padding: 0 9px;
 }
 
-.filter-custom input:focus {
+.filter-custom input:focus,
+.filter-custom select:focus {
   border-color: rgba(255, 255, 255, 0.72);
   outline: none;
 }
@@ -466,7 +468,11 @@ body.touch-guard-active {
   }
 
   .filter-custom {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-actions {
+    grid-column: 1 / -1;
   }
 
   .metric-grid > div:last-child {
