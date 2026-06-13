@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In - Magwalk</title>
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/auth.css" />
+  </head>
+  <body>
+    <main class="page-shell auth-shell">
+      <section class="auth-panel">
+        <p class="eyebrow">Magwalk</p>
+        <h1>Sign In</h1>
+        <form id="signinForm" class="auth-form">
+          <label>
+            ID
+            <input id="username" name="username" type="text" autocomplete="username" required />
+          </label>
+          <label>
+            Password
+            <input id="password" name="password" type="password" autocomplete="current-password" required />
+          </label>
+          <p id="authStatus" class="status-text"></p>
+          <div class="actions">
+            <button type="submit">Sign In</button>
+            <a class="button-link secondary" href="/signup">Sign Up</a>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script src="/js/signin.js"></script>
+  </body>
+</html>

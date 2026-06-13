@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Main - Magwalk</title>
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/location.css" />
+  </head>
+  <body>
+    <main class="page-shell app-shell">
+      <section class="panel">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Magwalk</p>
+            <h1>Location Collector</h1>
+          </div>
+          <div class="account-bar">
+            <span id="accountName">-</span>
+            <button id="signoutButton" class="secondary-button" type="button">Sign Out</button>
+          </div>
+        </div>
+
+        <p id="permissionStatus" class="status-text">Waiting for browser location permission.</p>
+
+        <div class="actions">
+          <button id="permissionButton" type="button">Permission</button>
+          <button id="startButton" type="button">Collect ON</button>
+          <button id="stopButton" type="button" disabled>Collect OFF</button>
+        </div>
+      </section>
+
+      <section class="location-panel" aria-live="polite">
+        <div class="metric">
+          <span>Latitude</span>
+          <strong id="latitude">-</strong>
+        </div>
+        <div class="metric">
+          <span>Longitude</span>
+          <strong id="longitude">-</strong>
+        </div>
+        <div class="metric">
+          <span>Accuracy</span>
+          <strong id="accuracy">-</strong>
+        </div>
+        <div class="metric">
+          <span>Collected At</span>
+          <strong id="collectedAt">-</strong>
+        </div>
+        <div class="metric">
+          <span>Last Commit</span>
+          <strong id="lastCommit">-</strong>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Location Log</h2>
+        <ol id="locationLog" class="location-log"></ol>
+      </section>
+    </main>
+
+    <script src="/js/location-collector.js"></script>
+    <script src="/js/location-page.js"></script>
+  </body>
+</html>

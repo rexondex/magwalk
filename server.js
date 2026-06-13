@@ -1,13 +1,32 @@
-const express = require('express'); // Express 라이브러리 불러오기
-const app = express();              // Express 애플리케이션 객체 생성
-const PORT = 3000;                  // 서버를 열 포트 번호 설정
+const express = require('express');
+const path = require('path');
+const { initializeDatabase } = require('./db/db');
+const authRoutes = require('./route/authRoutes');
+const locationRoutes = require('./route/locationRoutes');
+const pageRoutes = require('./route/pageRoutes');
 
-// 브라우저가 http://localhost:3000/ 에 접속했을 때(GET 요청)의 행동 정의
-app.get('/', (req, res) => {
-  res.send('Hello World! 서버가 정상적으로 작동 중입니다.');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(pageRoutes);
+app.use(authRoutes);
+app.use(locationRoutes);
+
+app.use((error, req, res, next) => {
+  console.error(error);
+  res.status(500).json({ message: 'Internal server error.' });
 });
 
-// 지정한 포트(3000)로 서버를 열고 대기 상태로 진입
-app.listen(PORT, () => {
-  console.log(`서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
-});
+initializeDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running at http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('Failed to initialize database:', error);
+    process.exit(1);
+  });

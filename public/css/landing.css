@@ -1,0 +1,18 @@
+.landing-shell {
+  min-height: 100vh;
+  display: grid;
+  align-items: center;
+}
+
+.landing-panel {
+  border: 1px solid #d9e0ea;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 28px;
+}
+
+.lead {
+  max-width: 620px;
+  color: #4b5563;
+  line-height: 1.6;
+}
