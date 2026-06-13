@@ -59,6 +59,17 @@ body {
   --bs-btn-hover-color: #05070b;
 }
 
+.btn-outline-secondary {
+  --bs-btn-color: #f8fafc;
+  --bs-btn-border-color: var(--magwalk-line);
+  --bs-btn-hover-color: #05070b;
+  --bs-btn-hover-bg: #f8fafc;
+  --bs-btn-hover-border-color: #f8fafc;
+  --bs-btn-active-color: #05070b;
+  --bs-btn-active-bg: #f8fafc;
+  --bs-btn-active-border-color: #f8fafc;
+}
+
 .btn-dark-ghost {
   border: 1px solid var(--magwalk-line);
   background: rgba(255, 255, 255, 0.04);
@@ -73,6 +84,40 @@ body {
 
 .text-secondary {
   color: var(--magwalk-muted) !important;
+}
+
+.text-bg-light {
+  background: #f8fafc !important;
+  color: #05070b !important;
+}
+
+.badge {
+  font-weight: 800;
+}
+
+.list-group {
+  --bs-list-group-bg: transparent;
+  --bs-list-group-color: var(--magwalk-ink);
+  --bs-list-group-border-color: var(--magwalk-line);
+}
+
+.modal {
+  --bs-modal-bg: var(--magwalk-bg);
+  --bs-modal-color: var(--magwalk-ink);
+  --bs-modal-border-color: var(--magwalk-line);
+  --bs-modal-header-border-color: var(--magwalk-line);
+}
+
+.modal-backdrop.show {
+  opacity: 0.78;
+}
+
+.modal-body {
+  background: var(--magwalk-bg);
+}
+
+.modal-header {
+  background: #090909;
 }
 
 .btn-close {

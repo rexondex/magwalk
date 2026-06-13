@@ -31,9 +31,20 @@
   color: var(--magwalk-ink);
 }
 
+.form-control::placeholder {
+  color: var(--magwalk-muted);
+}
+
 .form-control:focus {
   border-color: var(--magwalk-accent);
   background: #070a10;
   color: var(--magwalk-ink);
   box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.12);
+}
+
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--magwalk-ink);
+  box-shadow: 0 0 0 1000px #070a10 inset;
 }

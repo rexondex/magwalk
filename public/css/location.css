@@ -234,25 +234,26 @@
 
 .location-log li {
   border-color: var(--magwalk-line);
-  background: rgba(15, 23, 42, 0.72);
-  color: #cbd5e1;
+  background: #0a0a0a;
+  color: #d1d5db;
   line-height: 1.5;
 }
 
 .location-log li.saved {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.09);
   color: #f8fafc;
   font-weight: 700;
 }
 
 .location-log li.history {
-  background: rgba(15, 23, 42, 0.72);
-  color: #cbd5e1;
+  background: #0a0a0a;
+  color: #d1d5db;
 }
 
 .modal-content {
   border: 1px solid var(--magwalk-line);
   border-radius: 8px;
+  background: var(--magwalk-bg);
 }
 
 .modal-header {
