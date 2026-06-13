@@ -45,7 +45,7 @@
 
 .action-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 9px;
 }
 
@@ -261,6 +261,68 @@
   border-bottom-color: var(--magwalk-line);
 }
 
+body.touch-guard-active {
+  overflow: hidden;
+  user-select: none;
+}
+
+.touch-guard {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 24px;
+  touch-action: none;
+}
+
+.touch-guard[hidden] {
+  display: none;
+}
+
+.touch-guard-panel {
+  width: min(360px, 100%);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 8px;
+  background: rgba(5, 7, 11, 0.86);
+  color: var(--magwalk-ink);
+  padding: 22px;
+  text-align: center;
+}
+
+.touch-guard-panel h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.touch-guard-panel p:not(.eyebrow) {
+  margin: 0 0 18px;
+  color: var(--magwalk-muted);
+}
+
+.unlock-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.unlock-step {
+  aspect-ratio: 1;
+  border: 1px solid var(--magwalk-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--magwalk-ink);
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.unlock-step.is-next {
+  border-color: #f8fafc;
+  background: rgba(255, 255, 255, 0.16);
+}
+
 @media (max-width: 720px) {
   .app-shell {
     padding: 12px 0 20px;
@@ -291,7 +353,8 @@
   }
 
   .action-button {
-    min-height: 70px;
+    min-height: 66px;
+    padding-inline: 2px;
   }
 
   .action-button svg {
@@ -324,7 +387,12 @@
 
 @media (max-width: 380px) {
   .action-button span {
-    font-size: 11px;
+    font-size: 10px;
+  }
+
+  .action-button svg {
+    width: 20px;
+    height: 20px;
   }
 
   .location-map {

@@ -56,6 +56,13 @@
             </svg>
             <span>History</span>
           </button>
+          <button id="touchGuardButton" class="action-button action-muted" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <rect x="5" y="11" width="14" height="9" rx="2"></rect>
+              <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+            </svg>
+            <span>Guard</span>
+          </button>
         </div>
 
         <button
@@ -133,6 +140,19 @@
               <p id="historyEmpty" class="text-secondary mb-0">No location history yet.</p>
               <ol id="locationLog" class="location-log list-group list-group-numbered"></ol>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="touchGuard" class="touch-guard" hidden aria-hidden="true">
+        <div class="touch-guard-panel" role="dialog" aria-labelledby="touchGuardTitle">
+          <p class="eyebrow">Touch Guard</p>
+          <h2 id="touchGuardTitle">Touch prevention mode</h2>
+          <p>Unlock by pressing 1, 2, 3 in order.</p>
+          <div class="unlock-grid" aria-label="Touch guard unlock sequence">
+            <button class="unlock-step" type="button" data-unlock-step="1">1</button>
+            <button class="unlock-step" type="button" data-unlock-step="2">2</button>
+            <button class="unlock-step" type="button" data-unlock-step="3">3</button>
           </div>
         </div>
       </div>

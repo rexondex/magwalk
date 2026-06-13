@@ -32,6 +32,7 @@
   const permissionButton = document.querySelector('#permissionButton');
   const startButton = document.querySelector('#startButton');
   const stopButton = document.querySelector('#stopButton');
+  const touchGuardButton = document.querySelector('#touchGuardButton');
   const signoutButton = document.querySelector('#signoutButton');
   const permissionStatus = document.querySelector('#permissionStatus');
   const accountName = document.querySelector('#accountName');
@@ -43,12 +44,18 @@
   const locationLog = document.querySelector('#locationLog');
   const historyEmpty = document.querySelector('#historyEmpty');
   const pathCount = document.querySelector('#pathCount');
+  const touchGuard = document.querySelector('#touchGuard');
+  const unlockStepButtons = Array.from(document.querySelectorAll('[data-unlock-step]'));
 
   const mapState = {
     map: null,
     marker: null,
     coordinates: [],
   };
+
+  const wakeLockReasons = new Set();
+  let wakeLockSentinel = null;
+  let unlockExpectedStep = 1;
 
   function formatNumber(value) {
     return Number(value).toFixed(6);
@@ -83,6 +90,88 @@
 
   function setStatus(message) {
     permissionStatus.textContent = message;
+  }
+
+  async function requestWakeLock(reason) {
+    wakeLockReasons.add(reason);
+
+    if (!('wakeLock' in navigator)) {
+      setStatus('Screen wake lock is not supported in this browser.');
+      return;
+    }
+
+    if (wakeLockSentinel || document.visibilityState !== 'visible') {
+      return;
+    }
+
+    try {
+      wakeLockSentinel = await navigator.wakeLock.request('screen');
+      wakeLockSentinel.addEventListener('release', () => {
+        wakeLockSentinel = null;
+      });
+      setStatus('Screen wake lock is active.');
+    } catch (error) {
+      setStatus(`Screen wake lock failed: ${error.message}`);
+    }
+  }
+
+  async function releaseWakeLock(reason) {
+    wakeLockReasons.delete(reason);
+
+    if (wakeLockReasons.size || !wakeLockSentinel) {
+      return;
+    }
+
+    const sentinel = wakeLockSentinel;
+    wakeLockSentinel = null;
+
+    try {
+      await sentinel.release();
+    } catch (error) {
+      setStatus(`Screen wake lock release failed: ${error.message}`);
+    }
+  }
+
+  function refreshUnlockSteps() {
+    unlockStepButtons.forEach((button) => {
+      button.classList.toggle('is-next', Number(button.dataset.unlockStep) === unlockExpectedStep);
+    });
+  }
+
+  function openTouchGuard() {
+    unlockExpectedStep = 1;
+    refreshUnlockSteps();
+    document.body.classList.add('touch-guard-active');
+    touchGuard.hidden = false;
+    touchGuard.setAttribute('aria-hidden', 'false');
+    requestWakeLock('touch-guard');
+    setStatus('Touch prevention mode is ON.');
+  }
+
+  function closeTouchGuard() {
+    touchGuard.hidden = true;
+    touchGuard.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('touch-guard-active');
+    unlockExpectedStep = 1;
+    refreshUnlockSteps();
+    releaseWakeLock('touch-guard');
+    setStatus('Touch prevention mode is OFF.');
+  }
+
+  function handleUnlockStep(step) {
+    if (step !== unlockExpectedStep) {
+      unlockExpectedStep = 1;
+      refreshUnlockSteps();
+      return;
+    }
+
+    if (unlockExpectedStep === 3) {
+      closeTouchGuard();
+      return;
+    }
+
+    unlockExpectedStep += 1;
+    refreshUnlockSteps();
   }
 
   function pathGeoJson() {
@@ -318,6 +407,7 @@
   });
 
   startButton.addEventListener('click', () => {
+    requestWakeLock('collect');
     collector.start();
     startButton.disabled = true;
     stopButton.disabled = false;
@@ -325,12 +415,31 @@
 
   stopButton.addEventListener('click', () => {
     collector.stop();
+    releaseWakeLock('collect');
     startButton.disabled = false;
     stopButton.disabled = true;
   });
 
+  touchGuardButton.addEventListener('click', openTouchGuard);
+
+  unlockStepButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      handleUnlockStep(Number(button.dataset.unlockStep));
+    });
+  });
+
+  touchGuard.addEventListener(
+    'touchmove',
+    (event) => {
+      event.preventDefault();
+    },
+    { passive: false }
+  );
+
   signoutButton.addEventListener('click', async () => {
     collector.stop();
+    await releaseWakeLock('collect');
+    await releaseWakeLock('touch-guard');
     await fetch('/api/signout', { method: 'POST' });
     window.location.href = '/';
   });
@@ -346,12 +455,18 @@
 
   window.addEventListener('load', resizeMap);
   window.addEventListener('resize', resizeMap);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && wakeLockReasons.size) {
+      requestWakeLock(wakeLockReasons.values().next().value);
+    }
+  });
 
   if ('ResizeObserver' in window) {
     new ResizeObserver(resizeMap).observe(document.querySelector('#locationMap'));
   }
 
   bootMapAfterLayout();
+  refreshUnlockSteps();
   loadCurrentUser().then((isSignedIn) => {
     if (isSignedIn) {
       loadLocationHistory();
