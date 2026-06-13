@@ -7,6 +7,12 @@
   --magwalk-muted: #9ca3af;
   --magwalk-accent: #ffffff;
   --magwalk-soft: rgba(255, 255, 255, 0.08);
+  --magwalk-font:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 * {
@@ -22,7 +28,14 @@ body {
   margin: 0;
   background: linear-gradient(180deg, #090909 0%, var(--magwalk-bg) 100%);
   color: var(--magwalk-ink);
-  font-family: Arial, sans-serif;
+  font-family: var(--magwalk-font);
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: var(--magwalk-font);
 }
 
 .eyebrow {
