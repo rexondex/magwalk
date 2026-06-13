@@ -592,17 +592,52 @@ body.touch-guard-active {
     width: calc(100% - 20px);
   }
 
+  .app-header {
+    margin-bottom: 10px;
+  }
+
   .topbar {
-    align-items: stretch;
-    flex-direction: column;
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .topbar > div:first-child {
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .account-bar {
-    justify-content: space-between;
+    flex: 0 1 auto;
+    justify-content: flex-end;
+    gap: 7px;
   }
 
   .account-chip {
-    max-width: 58vw;
+    max-width: 22vw;
+    padding-inline: 10px;
+  }
+
+  .icon-button {
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+  }
+
+  .icon-button svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .account-bar .btn {
+    min-height: 34px;
+    padding: 0 10px;
+    white-space: nowrap;
+  }
+
+  .dashboard-toggle {
+    margin-top: 8px;
   }
 
   .action-grid {
@@ -678,6 +713,25 @@ body.touch-guard-active {
 }
 
 @media (max-width: 380px) {
+  .topbar {
+    gap: 7px;
+  }
+
+  .account-bar {
+    gap: 5px;
+  }
+
+  .account-chip {
+    max-width: 18vw;
+    font-size: 11px;
+    padding-inline: 8px;
+  }
+
+  .account-bar .btn {
+    font-size: 12px;
+    padding-inline: 8px;
+  }
+
   .action-button span {
     font-size: 10px;
   }
