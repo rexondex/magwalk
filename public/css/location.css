@@ -377,8 +377,7 @@
 }
 
 .location-log {
-  max-height: 70vh;
-  overflow: auto;
+  margin-bottom: 0;
 }
 
 .location-log li {
@@ -406,7 +405,6 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 12px;
   border: 1px solid var(--magwalk-line);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.08);
@@ -446,7 +444,14 @@
 }
 
 .history-modal-dialog .modal-body {
+  min-height: 180px;
   overflow: auto;
+}
+
+.history-modal-footer {
+  border-top-color: var(--magwalk-line);
+  background: rgba(5, 7, 11, 0.5);
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
 }
 
 .modal-header {
