@@ -5,7 +5,7 @@ const { getSessionUser, requirePageAuth } = require('./session');
 const router = express.Router();
 const htmlDir = path.join(__dirname, '..', 'public', 'html');
 
-router.get('/', (req, res) => {
+router.get('/', redirectSignedInUser, (req, res) => {
   res.sendFile(path.join(htmlDir, 'index.html'));
 });
 

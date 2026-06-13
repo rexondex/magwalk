@@ -38,8 +38,14 @@
               every 3 seconds.
             </p>
             <div class="d-flex flex-wrap gap-2">
-              <a class="btn btn-primary btn-lg" href="/signin">Sign In</a>
-              <a class="btn btn-outline-secondary btn-lg" href="/signup">Sign Up</a>
+              <a class="btn btn-primary btn-lg loading-link-button" href="/signin">
+                <span class="loading-button-label">Sign In</span>
+                <span class="loading-button-spinner" aria-hidden="true"></span>
+              </a>
+              <a class="btn btn-outline-secondary btn-lg loading-link-button" href="/signup">
+                <span class="loading-button-label">Sign Up</span>
+                <span class="loading-button-spinner" aria-hidden="true"></span>
+              </a>
             </div>
           </div>
           <div class="col-lg-5">
@@ -70,5 +76,6 @@
       </section>
     </main>
     <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/js/landing.js"></script>
   </body>
 </html>

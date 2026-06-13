@@ -125,6 +125,45 @@ select {
   color: var(--magwalk-ink);
 }
 
+.loading-link-button,
+.auth-submit-button {
+  min-height: 48px;
+  display: inline-grid;
+  place-items: center;
+}
+
+.loading-button-spinner,
+.auth-button-spinner {
+  width: 20px;
+  height: 20px;
+  display: none;
+  border: 2px solid rgba(5, 7, 11, 0.25);
+  border-top-color: #05070b;
+  border-radius: 50%;
+  animation: magwalk-spin 0.8s linear infinite;
+}
+
+.btn-outline-secondary .loading-button-spinner {
+  border-color: rgba(248, 250, 252, 0.28);
+  border-top-color: #f8fafc;
+}
+
+.loading-link-button.is-loading .loading-button-label,
+.auth-submit-button.is-loading .auth-button-label {
+  display: none;
+}
+
+.loading-link-button.is-loading .loading-button-spinner,
+.auth-submit-button.is-loading .auth-button-spinner {
+  display: inline-block;
+}
+
+@keyframes magwalk-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .text-secondary {
   color: var(--magwalk-muted) !important;
 }
