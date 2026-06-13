@@ -81,6 +81,7 @@
   let renderedHistoryCount = 0;
   let historyRequestId = 0;
   let historyAbortController = null;
+  let pendingPreset = null;
   let activeFilter = {
     from: null,
     to: null,
@@ -247,8 +248,13 @@
 
   function updatePresetButtons() {
     presetButtons.forEach((button) => {
-      button.classList.toggle('is-active', button.dataset.rangePreset === activeFilter.preset);
+      button.classList.toggle('is-active', button.dataset.rangePreset === pendingPreset);
     });
+  }
+
+  function clearPendingPreset() {
+    pendingPreset = null;
+    updatePresetButtons();
   }
 
   function setFilterControlsLoading(isLoading) {
@@ -840,20 +846,29 @@
   presetButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const preset = button.dataset.rangePreset;
-      activeFilter = {
-        from: presetStartDate(preset),
-        to: null,
-        preset,
-      };
-      setFilterInputs(activeFilter.from, null);
+      pendingPreset = preset;
+      setFilterInputs(presetStartDate(preset), null);
       updatePresetButtons();
-      loadLocationHistory();
+      setStatus('Filter range selected. Press Apply to update the map path.');
+    });
+  });
+
+  [filterFromDate, filterFromHour, filterToDate, filterToHour].forEach((control) => {
+    control.addEventListener('change', () => {
+      clearPendingPreset();
+      setStatus('Custom filter changed. Press Apply to update the map path.');
     });
   });
 
   applyFilterButton.addEventListener('click', () => {
-    const from = fromDateHourValues(filterFromDate.value, filterFromHour.value);
-    const to = fromDateHourValues(filterToDate.value, filterToHour.value, 59, 59, 999);
+    let from = fromDateHourValues(filterFromDate.value, filterFromHour.value);
+    let to = fromDateHourValues(filterToDate.value, filterToHour.value, 59, 59, 999);
+
+    if (pendingPreset) {
+      from = presetStartDate(pendingPreset);
+      to = null;
+      setFilterInputs(from, null);
+    }
 
     if (from && to && from > to) {
       setStatus('Filter start time must be before end time.');
@@ -863,21 +878,16 @@
     activeFilter = {
       from,
       to,
-      preset: null,
+      preset: pendingPreset,
     };
-    updatePresetButtons();
     loadLocationHistory();
   });
 
   clearFilterButton.addEventListener('click', () => {
-    activeFilter = {
-      from: null,
-      to: null,
-      preset: null,
-    };
+    pendingPreset = null;
     setFilterInputs(null, null);
     updatePresetButtons();
-    loadLocationHistory();
+    setStatus('Filter cleared. Press Apply to show the full map path.');
   });
 
   touchGuardButton.addEventListener('click', openTouchGuard);
