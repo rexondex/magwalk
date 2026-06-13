@@ -1,6 +1,8 @@
 (function () {
   const DEFAULT_CENTER = [127.0276, 37.4979];
   const DEFAULT_ZOOM = 11;
+  const HEALTH_CHECK_INTERVAL_MS = 5000;
+  const HEALTH_TIMEOUT_MS = 45000;
   const PATH_SOURCE_ID = 'magwalk-location-path-source';
   const PATH_LAYER_ID = 'magwalk-location-path-layer';
   const BASEMAP_STYLE = {
@@ -64,6 +66,8 @@
   const wakeLockReasons = new Set();
   let wakeLockSentinel = null;
   let unlockExpectedStep = 1;
+  let healthTimerId = null;
+  let lastHealthyAt = 0;
   let activeFilter = {
     from: null,
     to: null,
@@ -107,6 +111,41 @@
 
   function setRunningIndicator(isRunning) {
     runningIndicator.hidden = !isRunning;
+  }
+
+  function markCollectorHealthy() {
+    lastHealthyAt = Date.now();
+  }
+
+  function stopCollectorUi(message) {
+    collector.stop();
+    releaseWakeLock('collect');
+    stopHealthWatchdog();
+    setRunningIndicator(false);
+    startButton.disabled = false;
+    stopButton.disabled = true;
+    setStatus(message);
+  }
+
+  function startHealthWatchdog() {
+    markCollectorHealthy();
+    stopHealthWatchdog();
+    healthTimerId = window.setInterval(() => {
+      if (Date.now() - lastHealthyAt <= HEALTH_TIMEOUT_MS) {
+        return;
+      }
+
+      stopCollectorUi('Collection stopped automatically: no recent location or DB activity.');
+    }, HEALTH_CHECK_INTERVAL_MS);
+  }
+
+  function stopHealthWatchdog() {
+    if (!healthTimerId) {
+      return;
+    }
+
+    window.clearInterval(healthTimerId);
+    healthTimerId = null;
   }
 
   function toDateInputValue(date) {
@@ -499,6 +538,7 @@
   }
 
   function renderLocation(location) {
+    markCollectorHealthy();
     latitude.textContent = formatNumber(location.latitude);
     longitude.textContent = formatNumber(location.longitude);
     accuracy.textContent = formatAccuracy(location.accuracy);
@@ -506,6 +546,7 @@
   }
 
   function renderSaved(result) {
+    markCollectorHealthy();
     const savedAt = result.collectedAt || new Date();
     const matchesFilter = locationMatchesActiveFilter(result);
     lastCommit.textContent = formatTime(savedAt);
@@ -535,19 +576,21 @@
   });
 
   startButton.addEventListener('click', () => {
+    const didStart = collector.start();
+
+    if (!didStart) {
+      return;
+    }
+
     requestWakeLock('collect');
-    collector.start();
+    startHealthWatchdog();
     setRunningIndicator(true);
     startButton.disabled = true;
     stopButton.disabled = false;
   });
 
   stopButton.addEventListener('click', () => {
-    collector.stop();
-    releaseWakeLock('collect');
-    setRunningIndicator(false);
-    startButton.disabled = false;
-    stopButton.disabled = true;
+    stopCollectorUi('Location collection is OFF.');
   });
 
   presetButtons.forEach((button) => {
@@ -611,6 +654,7 @@
 
   signoutButton.addEventListener('click', async () => {
     collector.stop();
+    stopHealthWatchdog();
     setRunningIndicator(false);
     await releaseWakeLock('collect');
     await releaseWakeLock('touch-guard');

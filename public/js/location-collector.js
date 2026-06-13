@@ -32,11 +32,11 @@
     start() {
       if (this.isCollecting) {
         this.onStatus('Location collection is already ON.');
-        return;
+        return true;
       }
 
       if (!this.canUseGeolocation()) {
-        return;
+        return false;
       }
 
       this.isCollecting = true;
@@ -44,6 +44,7 @@
       this.onStatus('Watching location. Waiting for first GPS fix.');
       this.startWatching();
       this.collectTimerId = window.setInterval(() => this.commitLatestLocation(), COLLECT_INTERVAL_MS);
+      return true;
     }
 
     stop() {
