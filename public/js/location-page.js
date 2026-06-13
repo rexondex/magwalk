@@ -67,9 +67,10 @@
   function appendLog(text, className) {
     const item = document.createElement('li');
     item.textContent = text;
+    item.classList.add('list-group-item');
 
     if (className) {
-      item.classList.add(className);
+      item.classList.add(...className.split(' ').filter(Boolean));
     }
 
     locationLog.prepend(item);
@@ -256,7 +257,15 @@
     }
 
     const logs = await response.json();
-    logs.reverse().forEach((location) => addLocationToMap(location, false));
+    logs.reverse().forEach((location) => {
+      addLocationToMap(location, false);
+      appendLog(
+        `${formatTime(location.collectedAt)} | history | lat ${formatNumber(
+          location.latitude
+        )}, lng ${formatNumber(location.longitude)}, accuracy ${formatAccuracy(location.accuracy)}`,
+        'history'
+      );
+    });
   }
 
   async function loadCurrentUser() {

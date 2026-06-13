@@ -4,71 +4,106 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Main - Magwalk</title>
+    <link rel="stylesheet" href="/vendor/bootstrap/bootstrap.min.css" />
     <link href="/vendor/maplibre-gl/maplibre-gl.css?v=local" rel="stylesheet" />
     <link rel="stylesheet" href="/css/base.css" />
     <link rel="stylesheet" href="/css/location.css" />
   </head>
   <body>
-    <main class="page-shell app-shell">
-      <section class="panel">
-        <div class="topbar">
-          <div>
-            <p class="eyebrow">Magwalk</p>
-            <h1>Location Collector</h1>
+    <main class="app-shell container-fluid">
+      <section class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="topbar">
+            <div>
+              <p class="eyebrow">Magwalk</p>
+              <h1 class="h2 fw-bold mb-1">Location Collector</h1>
+              <p id="permissionStatus" class="status-text mb-0">
+                Waiting for browser location permission.
+              </p>
+            </div>
+            <div class="account-bar">
+              <span class="badge rounded-pill text-bg-light border" id="accountName">-</span>
+              <button id="signoutButton" class="btn btn-outline-secondary" type="button">
+                Sign Out
+              </button>
+            </div>
           </div>
-          <div class="account-bar">
-            <span id="accountName">-</span>
-            <button id="signoutButton" class="secondary-button" type="button">Sign Out</button>
+
+          <div class="btn-toolbar mt-4" role="toolbar" aria-label="Location collection controls">
+            <div class="btn-group flex-wrap gap-2" role="group">
+              <button id="permissionButton" class="btn btn-primary" type="button">Permission</button>
+              <button id="startButton" class="btn btn-success" type="button">Collect ON</button>
+              <button id="stopButton" class="btn btn-outline-danger" type="button" disabled>
+                Collect OFF
+              </button>
+            </div>
           </div>
         </div>
+      </section>
 
-        <p id="permissionStatus" class="status-text">Waiting for browser location permission.</p>
-
-        <div class="actions">
-          <button id="permissionButton" type="button">Permission</button>
-          <button id="startButton" type="button">Collect ON</button>
-          <button id="stopButton" type="button" disabled>Collect OFF</button>
+      <section class="row g-3 mb-4" aria-live="polite">
+        <div class="col-12 col-md">
+          <div class="metric card h-100 shadow-sm">
+            <div class="card-body">
+              <span>Latitude</span>
+              <strong id="latitude">-</strong>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md">
+          <div class="metric card h-100 shadow-sm">
+            <div class="card-body">
+              <span>Longitude</span>
+              <strong id="longitude">-</strong>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md">
+          <div class="metric card h-100 shadow-sm">
+            <div class="card-body">
+              <span>Accuracy</span>
+              <strong id="accuracy">-</strong>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md">
+          <div class="metric card h-100 shadow-sm">
+            <div class="card-body">
+              <span>Collected At</span>
+              <strong id="collectedAt">-</strong>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md">
+          <div class="metric card h-100 shadow-sm">
+            <div class="card-body">
+              <span>Last Commit</span>
+              <strong id="lastCommit">-</strong>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section class="location-panel" aria-live="polite">
-        <div class="metric">
-          <span>Latitude</span>
-          <strong id="latitude">-</strong>
-        </div>
-        <div class="metric">
-          <span>Longitude</span>
-          <strong id="longitude">-</strong>
-        </div>
-        <div class="metric">
-          <span>Accuracy</span>
-          <strong id="accuracy">-</strong>
-        </div>
-        <div class="metric">
-          <span>Collected At</span>
-          <strong id="collectedAt">-</strong>
-        </div>
-        <div class="metric">
-          <span>Last Commit</span>
-          <strong id="lastCommit">-</strong>
+      <section class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="map-header">
+            <h2 class="h4 fw-bold">Location Path</h2>
+            <span class="badge rounded-pill text-bg-success" id="pathCount">0 points</span>
+          </div>
+          <div id="locationMap" class="location-map" aria-label="Location path map"></div>
         </div>
       </section>
 
-      <section class="map-panel">
-        <div class="map-header">
-          <h2>Location Path</h2>
-          <span id="pathCount">0 points</span>
+      <section class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="h4 fw-bold">Location Log</h2>
+          <ol id="locationLog" class="location-log list-group list-group-numbered"></ol>
         </div>
-        <div id="locationMap" class="location-map" aria-label="Location path map"></div>
-      </section>
-
-      <section class="panel">
-        <h2>Location Log</h2>
-        <ol id="locationLog" class="location-log"></ol>
       </section>
     </main>
 
     <script src="/vendor/maplibre-gl/maplibre-gl.js?v=local"></script>
+    <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="/js/location-collector.js"></script>
     <script src="/js/location-page.js"></script>
   </body>

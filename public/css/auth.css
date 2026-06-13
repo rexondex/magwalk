@@ -2,36 +2,33 @@
   min-height: 100vh;
   display: grid;
   align-items: center;
+  padding: 32px 0;
 }
 
 .auth-panel {
   max-width: 460px;
   width: 100%;
   margin: 0 auto;
-  border: 1px solid #d9e0ea;
-  border-radius: 8px;
-  background: #ffffff;
-  padding: 28px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
 }
 
 .auth-form {
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 
-.auth-form label {
-  display: grid;
-  gap: 8px;
+.form-label {
   color: #475569;
   font-size: 14px;
   font-weight: 700;
 }
 
-.auth-form input {
-  min-height: 44px;
-  border: 1px solid #cbd5e1;
+.form-control {
+  border-color: #cbd5e1;
   border-radius: 6px;
-  color: #19202a;
-  font: inherit;
-  padding: 0 12px;
+}
+
+.form-control:focus {
+  border-color: var(--magwalk-blue);
+  box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.12);
 }

@@ -4,32 +4,38 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign Up - Magwalk</title>
+    <link rel="stylesheet" href="/vendor/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="/css/base.css" />
     <link rel="stylesheet" href="/css/auth.css" />
   </head>
   <body>
-    <main class="page-shell auth-shell">
-      <section class="auth-panel">
-        <p class="eyebrow">Magwalk</p>
-        <h1>Sign Up</h1>
-        <form id="signupForm" class="auth-form">
-          <label>
-            ID
-            <input id="username" name="username" type="text" autocomplete="username" required />
-          </label>
-          <label>
-            Password
-            <input id="password" name="password" type="password" autocomplete="new-password" required />
-          </label>
-          <p id="authStatus" class="status-text"></p>
-          <div class="actions">
-            <button type="submit">Create Account</button>
-            <a class="button-link secondary" href="/signin">Sign In</a>
+    <main class="auth-shell">
+      <section class="container">
+        <div class="auth-panel card shadow-sm">
+          <div class="card-body p-4 p-md-5">
+            <p class="eyebrow">Magwalk</p>
+            <h1 class="h2 fw-bold mb-4">Sign Up</h1>
+            <form id="signupForm" class="auth-form">
+              <div>
+                <label class="form-label" for="username">ID</label>
+                <input id="username" class="form-control form-control-lg" name="username" type="text" autocomplete="username" required />
+              </div>
+              <div>
+                <label class="form-label" for="password">Password</label>
+                <input id="password" class="form-control form-control-lg" name="password" type="password" autocomplete="new-password" required />
+              </div>
+              <p id="authStatus" class="status-text mb-0"></p>
+              <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-lg" type="submit">Create Account</button>
+                <a class="btn btn-outline-secondary btn-lg" href="/signin">Sign In</a>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       </section>
     </main>
 
+    <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="/js/signup.js"></script>
   </body>
 </html>
