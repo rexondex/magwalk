@@ -299,7 +299,23 @@ async function saveLocationLogs(locationLogs, user) {
   return result.rows.map(hydrateLocationLog);
 }
 
-async function getLocationLogs(user, limit = 100) {
+async function getLocationLogs(user, filters = {}) {
+  const limit = Math.min(Math.max(Number(filters.limit) || 500, 1), 2000);
+  const values = [user.id, lookupHash(user.id)];
+  const dateFilters = [];
+
+  if (filters.from) {
+    values.push(filters.from);
+    dateFilters.push(`collected_at >= $${values.length}`);
+  }
+
+  if (filters.to) {
+    values.push(filters.to);
+    dateFilters.push(`collected_at <= $${values.length}`);
+  }
+
+  values.push(limit);
+
   const result = await pool.query(
     `
       SELECT
@@ -313,12 +329,12 @@ async function getLocationLogs(user, limit = 100) {
         encrypted_payload AS "encryptedPayload",
         collected_at AS "collectedAt"
       FROM location_logs
-      WHERE user_id = $1
-         OR owner_lookup = $2
+      WHERE (user_id = $1 OR owner_lookup = $2)
+        ${dateFilters.length ? `AND ${dateFilters.join(' AND ')}` : ''}
       ORDER BY collected_at DESC
-      LIMIT $3
+      LIMIT $${values.length}
     `,
-    [user.id, lookupHash(user.id), limit]
+    values
   );
 
   return result.rows.map(hydrateLocationLog);

@@ -41,6 +41,11 @@
   const accuracy = document.querySelector('#accuracy');
   const collectedAt = document.querySelector('#collectedAt');
   const lastCommit = document.querySelector('#lastCommit');
+  const filterFrom = document.querySelector('#filterFrom');
+  const filterTo = document.querySelector('#filterTo');
+  const applyFilterButton = document.querySelector('#applyFilterButton');
+  const clearFilterButton = document.querySelector('#clearFilterButton');
+  const presetButtons = Array.from(document.querySelectorAll('[data-range-preset]'));
   const locationLog = document.querySelector('#locationLog');
   const historyEmpty = document.querySelector('#historyEmpty');
   const pathCount = document.querySelector('#pathCount');
@@ -56,6 +61,11 @@
   const wakeLockReasons = new Set();
   let wakeLockSentinel = null;
   let unlockExpectedStep = 1;
+  let activeFilter = {
+    from: null,
+    to: null,
+    preset: null,
+  };
 
   function formatNumber(value) {
     return Number(value).toFixed(6);
@@ -90,6 +100,66 @@
 
   function setStatus(message) {
     permissionStatus.textContent = message;
+  }
+
+  function toDatetimeLocalValue(date) {
+    const offsetMs = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
+  }
+
+  function fromDatetimeLocalValue(value) {
+    if (!value) {
+      return null;
+    }
+
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function presetStartDate(preset) {
+    const presetMs = {
+      '1h': 60 * 60 * 1000,
+      '6h': 6 * 60 * 60 * 1000,
+      '1d': 24 * 60 * 60 * 1000,
+      '7d': 7 * 24 * 60 * 60 * 1000,
+    };
+
+    return new Date(Date.now() - presetMs[preset]);
+  }
+
+  function updatePresetButtons() {
+    presetButtons.forEach((button) => {
+      button.classList.toggle('is-active', button.dataset.rangePreset === activeFilter.preset);
+    });
+  }
+
+  function buildLocationQuery() {
+    const params = new URLSearchParams();
+    params.set('limit', '2000');
+
+    if (activeFilter.from) {
+      params.set('from', activeFilter.from.toISOString());
+    }
+
+    if (activeFilter.to) {
+      params.set('to', activeFilter.to.toISOString());
+    }
+
+    return params.toString();
+  }
+
+  function locationMatchesActiveFilter(location) {
+    const collectedTime = new Date(location.collectedAt).getTime();
+
+    if (activeFilter.from && collectedTime < activeFilter.from.getTime()) {
+      return false;
+    }
+
+    if (activeFilter.to && collectedTime > activeFilter.to.getTime()) {
+      return false;
+    }
+
+    return true;
   }
 
   async function requestWakeLock(reason) {
@@ -256,6 +326,17 @@
     }
   }
 
+  function clearRenderedHistory() {
+    mapState.coordinates = [];
+    updatePathLayer();
+    updatePathCount();
+    locationLog.replaceChildren();
+
+    if (historyEmpty) {
+      historyEmpty.hidden = false;
+    }
+  }
+
   function initMap(center = DEFAULT_CENTER) {
     if (mapState.map) {
       resizeMap();
@@ -344,12 +425,14 @@
   }
 
   async function loadLocationHistory() {
-    const response = await fetch('/api/location');
+    const response = await fetch(`/api/location?${buildLocationQuery()}`);
 
     if (!response.ok) {
+      setStatus('Failed to load filtered location history.');
       return;
     }
 
+    clearRenderedHistory();
     const logs = await response.json();
     logs.reverse().forEach((location) => {
       addLocationToMap(location, false);
@@ -360,6 +443,7 @@
         'history'
       );
     });
+    setStatus(`History loaded: ${logs.length} records.`);
   }
 
   async function loadCurrentUser() {
@@ -384,14 +468,19 @@
 
   function renderSaved(result) {
     const savedAt = result.collectedAt || new Date();
+    const matchesFilter = locationMatchesActiveFilter(result);
     lastCommit.textContent = formatTime(savedAt);
-    addLocationToMap(result);
-    appendLog(
-      `${formatTime(savedAt)} | DB committed | lat ${formatNumber(result.latitude)}, lng ${formatNumber(
-        result.longitude
-      )}, accuracy ${formatAccuracy(result.accuracy)}`,
-      'saved'
-    );
+
+    if (matchesFilter) {
+      addLocationToMap(result);
+      appendLog(
+        `${formatTime(savedAt)} | DB committed | lat ${formatNumber(result.latitude)}, lng ${formatNumber(
+          result.longitude
+        )}, accuracy ${formatAccuracy(result.accuracy)}`,
+        'saved'
+      );
+    }
+
     setStatus('DB committed.');
   }
 
@@ -418,6 +507,51 @@
     releaseWakeLock('collect');
     startButton.disabled = false;
     stopButton.disabled = true;
+  });
+
+  presetButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const preset = button.dataset.rangePreset;
+      activeFilter = {
+        from: presetStartDate(preset),
+        to: null,
+        preset,
+      };
+      filterFrom.value = toDatetimeLocalValue(activeFilter.from);
+      filterTo.value = '';
+      updatePresetButtons();
+      loadLocationHistory();
+    });
+  });
+
+  applyFilterButton.addEventListener('click', () => {
+    const from = fromDatetimeLocalValue(filterFrom.value);
+    const to = fromDatetimeLocalValue(filterTo.value);
+
+    if (from && to && from > to) {
+      setStatus('Filter start time must be before end time.');
+      return;
+    }
+
+    activeFilter = {
+      from,
+      to,
+      preset: null,
+    };
+    updatePresetButtons();
+    loadLocationHistory();
+  });
+
+  clearFilterButton.addEventListener('click', () => {
+    activeFilter = {
+      from: null,
+      to: null,
+      preset: null,
+    };
+    filterFrom.value = '';
+    filterTo.value = '';
+    updatePresetButtons();
+    loadLocationHistory();
   });
 
   touchGuardButton.addEventListener('click', openTouchGuard);
@@ -467,6 +601,7 @@
 
   bootMapAfterLayout();
   refreshUnlockSteps();
+  updatePresetButtons();
   loadCurrentUser().then((isSignedIn) => {
     if (isSignedIn) {
       loadLocationHistory();

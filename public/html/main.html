@@ -84,6 +84,31 @@
         <p id="permissionStatus" class="status-text">
           Waiting for browser location permission.
         </p>
+        <div class="history-filter">
+          <div class="filter-row">
+            <span class="filter-label">Quick range</span>
+            <div class="filter-presets" aria-label="History range presets">
+              <button class="filter-chip" type="button" data-range-preset="1h">1h</button>
+              <button class="filter-chip" type="button" data-range-preset="6h">6h</button>
+              <button class="filter-chip" type="button" data-range-preset="1d">1d</button>
+              <button class="filter-chip" type="button" data-range-preset="7d">7d</button>
+            </div>
+          </div>
+          <div class="filter-row filter-custom">
+            <label>
+              <span>From</span>
+              <input id="filterFrom" type="datetime-local" />
+            </label>
+            <label>
+              <span>To</span>
+              <input id="filterTo" type="datetime-local" />
+            </label>
+            <div class="filter-actions">
+              <button id="applyFilterButton" class="filter-chip" type="button">Apply</button>
+              <button id="clearFilterButton" class="filter-chip" type="button">Clear</button>
+            </div>
+          </div>
+        </div>
         <div class="metric-grid">
           <div>
             <div class="metric">

@@ -25,9 +25,35 @@ function normalizeLocationPayload(payload) {
   };
 }
 
+function normalizeLocationFilters(query) {
+  const from = query.from ? new Date(query.from) : null;
+  const to = query.to ? new Date(query.to) : null;
+  const limit = query.limit ? Number(query.limit) : 500;
+
+  if ((from && Number.isNaN(from.getTime())) || (to && Number.isNaN(to.getTime()))) {
+    return null;
+  }
+
+  if (from && to && from > to) {
+    return null;
+  }
+
+  return {
+    from: from ? from.toISOString() : null,
+    to: to ? to.toISOString() : null,
+    limit: Number.isFinite(limit) ? limit : 500,
+  };
+}
+
 router.get('/api/location', requireAuth, async (req, res, next) => {
   try {
-    const logs = await getLocationLogs(req.user);
+    const filters = normalizeLocationFilters(req.query || {});
+
+    if (!filters) {
+      return res.status(400).json({ message: 'Invalid location history filter.' });
+    }
+
+    const logs = await getLocationLogs(req.user, filters);
     res.json(logs);
   } catch (error) {
     next(error);

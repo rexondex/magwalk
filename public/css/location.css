@@ -140,6 +140,87 @@
   padding: 10px 12px;
 }
 
+.history-filter {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 8px;
+  border: 1px solid var(--magwalk-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 10px;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.filter-label {
+  color: var(--magwalk-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.filter-presets,
+.filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-chip {
+  min-height: 34px;
+  border: 1px solid var(--magwalk-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--magwalk-ink);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 12px;
+}
+
+.filter-chip.is-active,
+.filter-chip:hover {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.filter-custom {
+  align-items: end;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
+.filter-custom label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: var(--magwalk-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.filter-custom input {
+  min-height: 36px;
+  width: 100%;
+  border: 1px solid var(--magwalk-line);
+  border-radius: 8px;
+  background: #080808;
+  color: var(--magwalk-ink);
+  font: inherit;
+  font-size: 12px;
+  padding: 0 9px;
+}
+
+.filter-custom input:focus {
+  border-color: rgba(255, 255, 255, 0.72);
+  outline: none;
+}
+
 .dashboard-panel .metric-grid {
   width: 100%;
 }
@@ -364,6 +445,28 @@ body.touch-guard-active {
 
   .metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filter-presets,
+  .filter-actions {
+    display: grid;
+  }
+
+  .filter-presets {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .filter-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .filter-custom {
+    grid-template-columns: 1fr;
   }
 
   .metric-grid > div:last-child {
