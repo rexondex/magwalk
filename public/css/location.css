@@ -280,6 +280,41 @@
   margin-bottom: 0;
 }
 
+.map-header-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.running-indicator {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 10px;
+}
+
+.running-spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  border-top-color: #f8fafc;
+  border-radius: 50%;
+  animation: running-spin 0.8s linear infinite;
+}
+
+@keyframes running-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .path-count {
   border: 1px solid var(--magwalk-line);
   border-radius: 999px;

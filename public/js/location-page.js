@@ -51,6 +51,7 @@
   const locationLog = document.querySelector('#locationLog');
   const historyEmpty = document.querySelector('#historyEmpty');
   const pathCount = document.querySelector('#pathCount');
+  const runningIndicator = document.querySelector('#runningIndicator');
   const touchGuard = document.querySelector('#touchGuard');
   const unlockStepButtons = Array.from(document.querySelectorAll('[data-unlock-step]'));
 
@@ -102,6 +103,10 @@
 
   function setStatus(message) {
     permissionStatus.textContent = message;
+  }
+
+  function setRunningIndicator(isRunning) {
+    runningIndicator.hidden = !isRunning;
   }
 
   function toDateInputValue(date) {
@@ -532,6 +537,7 @@
   startButton.addEventListener('click', () => {
     requestWakeLock('collect');
     collector.start();
+    setRunningIndicator(true);
     startButton.disabled = true;
     stopButton.disabled = false;
   });
@@ -539,6 +545,7 @@
   stopButton.addEventListener('click', () => {
     collector.stop();
     releaseWakeLock('collect');
+    setRunningIndicator(false);
     startButton.disabled = false;
     stopButton.disabled = true;
   });
@@ -604,6 +611,7 @@
 
   signoutButton.addEventListener('click', async () => {
     collector.stop();
+    setRunningIndicator(false);
     await releaseWakeLock('collect');
     await releaseWakeLock('touch-guard');
     await fetch('/api/signout', { method: 'POST' });
