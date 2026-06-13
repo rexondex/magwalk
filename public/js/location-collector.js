@@ -8,9 +8,10 @@
       this.onSaved = onSaved;
       this.onError = onError;
       this.collectTimerId = null;
+      this.watchId = null;
       this.isCollecting = false;
-      this.isReadingLocation = false;
       this.isSaving = false;
+      this.lastLocation = null;
     }
 
     requestPermission() {
@@ -39,9 +40,10 @@
       }
 
       this.isCollecting = true;
-      this.onStatus('Collecting and committing every 3s.');
-      this.collect();
-      this.collectTimerId = window.setInterval(() => this.collect(), COLLECT_INTERVAL_MS);
+      this.lastLocation = null;
+      this.onStatus('Watching location. Waiting for first GPS fix.');
+      this.startWatching();
+      this.collectTimerId = window.setInterval(() => this.commitLatestLocation(), COLLECT_INTERVAL_MS);
     }
 
     stop() {
@@ -49,30 +51,50 @@
         window.clearInterval(this.collectTimerId);
       }
 
+      if (this.watchId !== null) {
+        navigator.geolocation.clearWatch(this.watchId);
+      }
+
       this.collectTimerId = null;
+      this.watchId = null;
       this.isCollecting = false;
+      this.lastLocation = null;
       this.onStatus('Location collection is OFF.');
     }
 
-    collect() {
-      if (!this.isCollecting || this.isReadingLocation) {
+    startWatching() {
+      if (this.watchId !== null) {
         return;
       }
 
-      this.isReadingLocation = true;
-      navigator.geolocation.getCurrentPosition(
+      this.watchId = navigator.geolocation.watchPosition(
         (position) => {
           const location = this.positionToPayload(position);
+          this.lastLocation = location;
           this.onLocation(location);
-          this.isReadingLocation = false;
-          this.saveLocation(location);
+          this.onStatus('Location watch is active. Committing latest fix every 3s.');
         },
         (error) => {
-          this.isReadingLocation = false;
           this.handleError(error);
         },
         this.positionOptions()
       );
+    }
+
+    commitLatestLocation() {
+      if (!this.isCollecting) {
+        return;
+      }
+
+      if (!this.lastLocation) {
+        this.onStatus('Waiting for mobile GPS fix before first DB commit.');
+        return;
+      }
+
+      this.saveLocation({
+        ...this.lastLocation,
+        collectedAt: new Date().toISOString(),
+      });
     }
 
     async saveLocation(location) {
@@ -114,8 +136,8 @@
     positionOptions() {
       return {
         enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 5000,
+        maximumAge: 10000,
+        timeout: 20000,
       };
     }
 
