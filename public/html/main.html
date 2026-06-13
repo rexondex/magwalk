@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Main - Magwalk</title>
+    <link href="https://unpkg.com/maplibre-gl@4.1.1/dist/maplibre-gl.css" rel="stylesheet" />
     <link rel="stylesheet" href="/css/base.css" />
     <link rel="stylesheet" href="/css/location.css" />
   </head>
@@ -53,12 +54,21 @@
         </div>
       </section>
 
+      <section class="map-panel">
+        <div class="map-header">
+          <h2>Location Path</h2>
+          <span id="pathCount">0 points</span>
+        </div>
+        <div id="locationMap" class="location-map" aria-label="Location path map"></div>
+      </section>
+
       <section class="panel">
         <h2>Location Log</h2>
         <ol id="locationLog" class="location-log"></ol>
       </section>
     </main>
 
+    <script src="https://unpkg.com/maplibre-gl@4.1.1/dist/maplibre-gl.js"></script>
     <script src="/js/location-collector.js"></script>
     <script src="/js/location-page.js"></script>
   </body>
