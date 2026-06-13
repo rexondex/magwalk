@@ -136,3 +136,154 @@ select {
 .btn-close {
   filter: invert(1) grayscale(1);
 }
+
+.preview-page {
+  position: relative;
+  overflow-x: hidden;
+}
+
+.preview-page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.app-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  gap: 14px;
+  padding: 24px max(18px, calc((100vw - 1180px) / 2));
+  opacity: 0.82;
+  pointer-events: none;
+}
+
+.preview-top {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 86px 94px;
+  gap: 10px;
+  align-items: start;
+}
+
+.preview-top span {
+  min-height: 38px;
+  border: 1px solid var(--magwalk-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.preview-top span:first-child {
+  max-width: 320px;
+  min-height: 64px;
+}
+
+.preview-actions {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.preview-actions span {
+  height: 76px;
+  border: 1px solid var(--magwalk-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.preview-dashboard {
+  height: 96px;
+  border: 1px solid var(--magwalk-line);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, transparent 0, transparent 20%, var(--magwalk-line) 20%, var(--magwalk-line) calc(20% + 1px), transparent calc(20% + 1px)),
+    linear-gradient(90deg, transparent 0, transparent 40%, var(--magwalk-line) 40%, var(--magwalk-line) calc(40% + 1px), transparent calc(40% + 1px)),
+    linear-gradient(90deg, transparent 0, transparent 60%, var(--magwalk-line) 60%, var(--magwalk-line) calc(60% + 1px), transparent calc(60% + 1px)),
+    linear-gradient(90deg, transparent 0, transparent 80%, var(--magwalk-line) 80%, var(--magwalk-line) calc(80% + 1px), transparent calc(80% + 1px)),
+    rgba(255, 255, 255, 0.04);
+}
+
+.preview-map {
+  position: relative;
+  min-height: 430px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    #0a0a0a;
+  background-size: 90px 90px;
+}
+
+.preview-map::before,
+.preview-map::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(248, 250, 252, 0.72);
+}
+
+.preview-map::before {
+  width: 34%;
+  height: 5px;
+  left: 22%;
+  top: 36%;
+  transform: rotate(-8deg);
+}
+
+.preview-map::after {
+  width: 28%;
+  height: 5px;
+  left: 38%;
+  top: 58%;
+  transform: rotate(42deg);
+}
+
+.preview-map span {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 38%;
+  top: 34%;
+  border-radius: 50%;
+  background: #f8fafc;
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.12);
+}
+
+.preview-page main {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 720px) {
+  .app-preview {
+    gap: 10px;
+    padding: 12px 10px;
+  }
+
+  .preview-top {
+    grid-template-columns: 1fr 74px;
+  }
+
+  .preview-top span:nth-child(2) {
+    display: none;
+  }
+
+  .preview-actions {
+    gap: 8px;
+  }
+
+  .preview-actions span {
+    height: 66px;
+  }
+
+  .preview-dashboard {
+    height: 118px;
+  }
+
+  .preview-map {
+    min-height: 58vh;
+  }
+}
