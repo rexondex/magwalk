@@ -53,6 +53,7 @@
   const locationLog = document.querySelector('#locationLog');
   const historyEmpty = document.querySelector('#historyEmpty');
   const pathCount = document.querySelector('#pathCount');
+  const permissionIndicator = document.querySelector('#permissionIndicator');
   const runningIndicator = document.querySelector('#runningIndicator');
   const touchGuard = document.querySelector('#touchGuard');
   const unlockStepButtons = Array.from(document.querySelectorAll('[data-unlock-step]'));
@@ -68,6 +69,7 @@
   let unlockExpectedStep = 1;
   let healthTimerId = null;
   let lastHealthyAt = 0;
+  let geolocationPermissionStatus = null;
   let activeFilter = {
     from: null,
     to: null,
@@ -111,6 +113,28 @@
 
   function setRunningIndicator(isRunning) {
     runningIndicator.hidden = !isRunning;
+  }
+
+  function setPermitHighlight(isPermitted) {
+    permissionIndicator.hidden = !isPermitted;
+  }
+
+  async function refreshPermissionState() {
+    if (!navigator.permissions?.query) {
+      return;
+    }
+
+    try {
+      geolocationPermissionStatus =
+        geolocationPermissionStatus ||
+        (await navigator.permissions.query({ name: 'geolocation' }));
+      setPermitHighlight(geolocationPermissionStatus.state === 'granted');
+      geolocationPermissionStatus.onchange = () => {
+        setPermitHighlight(geolocationPermissionStatus.state === 'granted');
+      };
+    } catch (error) {
+      setPermitHighlight(false);
+    }
   }
 
   function markCollectorHealthy() {
@@ -569,10 +593,12 @@
     onLocation: renderLocation,
     onSaved: renderSaved,
     onError: setStatus,
+    onPermission: setPermitHighlight,
   });
 
   permissionButton.addEventListener('click', () => {
     collector.requestPermission();
+    window.setTimeout(refreshPermissionState, 500);
   });
 
   startButton.addEventListener('click', () => {
@@ -687,6 +713,7 @@
   refreshUnlockSteps();
   populateHourSelects();
   updatePresetButtons();
+  refreshPermissionState();
   loadCurrentUser().then((isSignedIn) => {
     if (isSignedIn) {
       loadLocationHistory();

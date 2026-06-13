@@ -286,6 +286,28 @@
   gap: 8px;
 }
 
+.permission-indicator {
+  width: 32px;
+  height: 32px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #05070b;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.permission-indicator svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
 .running-indicator {
   min-height: 32px;
   display: inline-flex;

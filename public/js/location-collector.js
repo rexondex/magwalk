@@ -2,11 +2,12 @@
   const COLLECT_INTERVAL_MS = 3000;
 
   class LocationCollector {
-    constructor({ onStatus, onLocation, onSaved, onError }) {
+    constructor({ onStatus, onLocation, onSaved, onError, onPermission }) {
       this.onStatus = onStatus;
       this.onLocation = onLocation;
       this.onSaved = onSaved;
       this.onError = onError;
+      this.onPermission = onPermission;
       this.collectTimerId = null;
       this.watchId = null;
       this.isCollecting = false;
@@ -22,9 +23,13 @@
       this.onStatus('Requesting browser location permission.');
       navigator.geolocation.getCurrentPosition(
         () => {
+          this.onPermission?.(true);
           this.onStatus('Location permission is available.');
         },
-        (error) => this.handleError(error),
+        (error) => {
+          this.onPermission?.(false);
+          this.handleError(error);
+        },
         this.positionOptions()
       );
     }
