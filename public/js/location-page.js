@@ -1,4 +1,9 @@
 (function () {
+  const DEFAULT_CENTER = [127.0276, 37.4979];
+  const DEFAULT_ZOOM = 13;
+  const PATH_SOURCE_ID = 'magwalk-location-path-source';
+  const PATH_LAYER_ID = 'magwalk-location-path-layer';
+
   const permissionButton = document.querySelector('#permissionButton');
   const startButton = document.querySelector('#startButton');
   const stopButton = document.querySelector('#stopButton');
@@ -16,7 +21,6 @@
   const mapState = {
     map: null,
     marker: null,
-    pathLine: null,
     coordinates: [],
   };
 
@@ -50,25 +54,97 @@
     permissionStatus.textContent = message;
   }
 
-  function initMap() {
-    if (mapState.map || !window.L) {
+  function pathGeoJson() {
+    return {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'LineString',
+        coordinates: mapState.coordinates,
+      },
+    };
+  }
+
+  function resizeMap() {
+    if (!mapState.map) {
       return;
     }
 
-    const defaultCenter = [37.5665, 126.978];
-    mapState.map = L.map('locationMap').setView(defaultCenter, 16);
+    mapState.map.resize();
+    window.requestAnimationFrame(() => mapState.map?.resize());
+    window.setTimeout(() => mapState.map?.resize(), 100);
+  }
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
-    }).addTo(mapState.map);
+  function ensurePathLayer() {
+    if (!mapState.map || !mapState.map.isStyleLoaded()) {
+      return;
+    }
 
-    mapState.pathLine = L.polyline([], {
-      color: '#16a34a',
-      opacity: 0.9,
-      weight: 5,
-    }).addTo(mapState.map);
+    if (!mapState.map.getSource(PATH_SOURCE_ID)) {
+      mapState.map.addSource(PATH_SOURCE_ID, {
+        type: 'geojson',
+        data: pathGeoJson(),
+      });
+    }
 
-    mapState.marker = L.marker(defaultCenter).addTo(mapState.map);
+    if (!mapState.map.getLayer(PATH_LAYER_ID)) {
+      mapState.map.addLayer({
+        id: PATH_LAYER_ID,
+        type: 'line',
+        source: PATH_SOURCE_ID,
+        layout: {
+          'line-cap': 'round',
+          'line-join': 'round',
+        },
+        paint: {
+          'line-color': '#16a34a',
+          'line-opacity': 0.95,
+          'line-width': 5,
+        },
+      });
+    }
+  }
+
+  function updatePathLayer() {
+    ensurePathLayer();
+    const source = mapState.map?.getSource(PATH_SOURCE_ID);
+
+    if (source) {
+      source.setData(pathGeoJson());
+    }
+  }
+
+  function initMap(center = DEFAULT_CENTER) {
+    if (mapState.map) {
+      resizeMap();
+      return;
+    }
+
+    if (!window.maplibregl) {
+      setStatus('MapLibre GL JS is not loaded.');
+      return;
+    }
+
+    mapState.map = new maplibregl.Map({
+      container: 'locationMap',
+      style: 'https://demotiles.maplibre.org/style.json',
+      center,
+      zoom: DEFAULT_ZOOM,
+    });
+
+    mapState.map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+    mapState.marker = new maplibregl.Marker({ color: '#ef4444' })
+      .setLngLat(center)
+      .setPopup(new maplibregl.Popup().setHTML('<strong>Current location</strong>'))
+      .addTo(mapState.map);
+
+    mapState.map.on('load', () => {
+      ensurePathLayer();
+      resizeMap();
+    });
+
+    resizeMap();
   }
 
   function updatePathCount() {
@@ -91,23 +167,28 @@
       return;
     }
 
-    const latLng = [latitudeValue, longitudeValue];
-    mapState.coordinates.push(latLng);
-    mapState.pathLine.setLatLngs(mapState.coordinates);
-    mapState.marker.setLatLng(latLng);
+    const lngLat = [longitudeValue, latitudeValue];
+    mapState.coordinates.push(lngLat);
+    mapState.marker.setLngLat(lngLat);
+    updatePathLayer();
     updatePathCount();
+    resizeMap();
 
     if (shouldPan) {
-      mapState.map.panTo(latLng);
+      mapState.map.easeTo({ center: lngLat, duration: 700 });
       return;
     }
 
     if (mapState.coordinates.length > 1) {
-      mapState.map.fitBounds(mapState.pathLine.getBounds(), { padding: [24, 24] });
+      const bounds = mapState.coordinates.reduce(
+        (nextBounds, coordinate) => nextBounds.extend(coordinate),
+        new maplibregl.LngLatBounds(mapState.coordinates[0], mapState.coordinates[0])
+      );
+      mapState.map.fitBounds(bounds, { padding: 32, duration: 0 });
       return;
     }
 
-    mapState.map.setView(latLng, 16);
+    mapState.map.setCenter(lngLat);
   }
 
   async function loadLocationHistory() {
@@ -183,7 +264,23 @@
     window.location.href = '/';
   });
 
-  initMap();
+  function bootMapAfterLayout() {
+    window.requestAnimationFrame(() => {
+      window.setTimeout(() => {
+        initMap();
+        resizeMap();
+      }, 100);
+    });
+  }
+
+  window.addEventListener('load', resizeMap);
+  window.addEventListener('resize', resizeMap);
+
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(resizeMap).observe(document.querySelector('#locationMap'));
+  }
+
+  bootMapAfterLayout();
   loadCurrentUser().then((isSignedIn) => {
     if (isSignedIn) {
       loadLocationHistory();
