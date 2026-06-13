@@ -122,15 +122,15 @@ select {
 }
 
 .modal-backdrop.show {
-  opacity: 0.78;
+  opacity: 0.5;
 }
 
 .modal-body {
-  background: var(--magwalk-bg);
+  background: rgba(5, 7, 11, 0.5);
 }
 
 .modal-header {
-  background: #090909;
+  background: rgba(9, 9, 9, 0.5);
 }
 
 .btn-close {
