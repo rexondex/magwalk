@@ -521,8 +521,11 @@
 
 .maplibregl-popup-content {
   background: #f8fafc;
+  border: 2px solid #05070b;
+  border-radius: 8px;
   color: #05070b;
   font-weight: 800;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.34);
 }
 
 .maplibregl-popup-tip {
@@ -530,6 +533,16 @@
   border-bottom-color: #f8fafc;
   border-left-color: #f8fafc;
   border-right-color: #f8fafc;
+  filter: drop-shadow(0 1px 0 #05070b);
+}
+
+.maplibregl-marker svg {
+  filter:
+    drop-shadow(0 0 1px #05070b)
+    drop-shadow(0 0 1px #05070b)
+    drop-shadow(0 6px 12px rgba(0, 0, 0, 0.42));
+  stroke: #05070b;
+  stroke-width: 1.5px;
 }
 
 body.touch-guard-active {

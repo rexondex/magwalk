@@ -515,7 +515,7 @@
         source: START_POINT_SOURCE_ID,
         paint: {
           'circle-color': '#22d3ee',
-          'circle-radius': 8,
+          'circle-radius': 9,
           'circle-stroke-color': '#05070b',
           'circle-stroke-width': 3,
         },
@@ -538,7 +538,7 @@
         source: END_POINT_SOURCE_ID,
         paint: {
           'circle-color': '#d946ef',
-          'circle-radius': 8,
+          'circle-radius': 9,
           'circle-stroke-color': '#05070b',
           'circle-stroke-width': 3,
         },
