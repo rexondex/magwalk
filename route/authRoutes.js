@@ -50,7 +50,7 @@ router.post('/api/signup', async (req, res, next) => {
       passwordSalt: passwordData.salt,
     });
 
-    setSession(res, user);
+    await setSession(res, user);
     return res.status(201).json({ user: { id: user.id, username: user.username } });
   } catch (error) {
     return next(error);
@@ -67,16 +67,20 @@ router.post('/api/signin', async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid ID or password.' });
     }
 
-    setSession(res, user);
+    await setSession(res, user);
     return res.json({ user: { id: user.id, username: user.username } });
   } catch (error) {
     return next(error);
   }
 });
 
-router.post('/api/signout', (req, res) => {
-  clearSession(req, res);
-  res.json({ ok: true });
+router.post('/api/signout', async (req, res, next) => {
+  try {
+    await clearSession(req, res);
+    res.json({ ok: true });
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;

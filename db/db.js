@@ -49,6 +49,16 @@ async function initializeDatabase() {
   `);
 
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS user_sessions (
+      token_lookup TEXT PRIMARY KEY,
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      expires_at TIMESTAMPTZ NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
     ALTER TABLE users
       ADD COLUMN IF NOT EXISTS username_lookup TEXT
   `);
@@ -70,6 +80,11 @@ async function initializeDatabase() {
   await pool.query(`
     CREATE INDEX IF NOT EXISTS location_logs_owner_lookup_idx
     ON location_logs (owner_lookup)
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS user_sessions_expires_at_idx
+    ON user_sessions (expires_at)
   `);
 
   await pool.query(`
@@ -342,9 +357,63 @@ async function getLocationLogs(user, filters = {}) {
   return result.rows.map(hydrateLocationLog);
 }
 
+async function createSession(token, user, expiresAt) {
+  await pool.query(
+    `
+      INSERT INTO user_sessions (token_lookup, user_id, expires_at)
+      VALUES ($1, $2, $3)
+      ON CONFLICT (token_lookup)
+      DO UPDATE SET
+        user_id = EXCLUDED.user_id,
+        expires_at = EXCLUDED.expires_at,
+        last_seen_at = NOW()
+    `,
+    [lookupHash(token), user.id, expiresAt]
+  );
+}
+
+async function findSessionUser(token) {
+  await pool.query('DELETE FROM user_sessions WHERE expires_at <= NOW()');
+
+  const result = await pool.query(
+    `
+      UPDATE user_sessions
+      SET last_seen_at = NOW()
+      FROM users
+      WHERE user_sessions.token_lookup = $1
+        AND user_sessions.user_id = users.id
+        AND user_sessions.expires_at > NOW()
+      RETURNING
+        users.id,
+        users.username,
+        users.created_at AS "createdAt"
+    `,
+    [lookupHash(token)]
+  );
+
+  const row = result.rows[0];
+
+  if (!row) {
+    return null;
+  }
+
+  return {
+    id: row.id,
+    username: decryptText(row.username),
+    createdAt: row.createdAt,
+  };
+}
+
+async function deleteSession(token) {
+  await pool.query('DELETE FROM user_sessions WHERE token_lookup = $1', [lookupHash(token)]);
+}
+
 module.exports = {
+  createSession,
   createUser,
+  deleteSession,
   findUserByUsername,
+  findSessionUser,
   getLocationLogs,
   initializeDatabase,
   saveLocationLogs,
