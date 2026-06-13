@@ -61,6 +61,7 @@ select {
 .btn {
   border-radius: 6px;
   font-weight: 700;
+  --bs-btn-focus-box-shadow: 0 0 0 0.25rem rgba(248, 250, 252, 0.18);
 }
 
 .btn-primary {
@@ -70,6 +71,12 @@ select {
   --bs-btn-hover-bg: #e5e7eb;
   --bs-btn-hover-border-color: #e5e7eb;
   --bs-btn-hover-color: #05070b;
+  --bs-btn-active-bg: #d1d5db;
+  --bs-btn-active-border-color: #d1d5db;
+  --bs-btn-active-color: #05070b;
+  --bs-btn-disabled-bg: #9ca3af;
+  --bs-btn-disabled-border-color: #9ca3af;
+  --bs-btn-disabled-color: #05070b;
 }
 
 .btn-outline-secondary {
@@ -81,6 +88,22 @@ select {
   --bs-btn-active-color: #05070b;
   --bs-btn-active-bg: #f8fafc;
   --bs-btn-active-border-color: #f8fafc;
+  --bs-btn-focus-shadow-rgb: 248, 250, 252;
+  --bs-btn-disabled-color: #9ca3af;
+  --bs-btn-disabled-border-color: rgba(156, 163, 175, 0.35);
+}
+
+.btn-primary:focus-visible,
+.btn-outline-secondary:focus-visible,
+.btn-dark-ghost:focus-visible {
+  box-shadow: 0 0 0 0.25rem rgba(248, 250, 252, 0.18);
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.btn-outline-secondary:active,
+.btn-outline-secondary.active {
+  box-shadow: inset 0 0 0 999px rgba(0, 0, 0, 0.08);
 }
 
 .btn-dark-ghost {
@@ -92,6 +115,13 @@ select {
 .btn-dark-ghost:hover {
   border-color: rgba(248, 250, 252, 0.42);
   background: rgba(255, 255, 255, 0.08);
+  color: var(--magwalk-ink);
+}
+
+.btn-dark-ghost:active,
+.btn-dark-ghost.active {
+  border-color: rgba(248, 250, 252, 0.58);
+  background: rgba(255, 255, 255, 0.12);
   color: var(--magwalk-ink);
 }
 
