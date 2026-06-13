@@ -390,6 +390,39 @@
   color: #d1d5db;
 }
 
+.load-more-history {
+  width: 100%;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  border: 1px solid var(--magwalk-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--magwalk-ink);
+  font-weight: 800;
+}
+
+.load-more-history[hidden] {
+  display: none;
+}
+
+.load-more-history svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.load-more-history:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
 .modal-content {
   border: 1px solid var(--magwalk-line);
   border-radius: 8px;

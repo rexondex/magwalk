@@ -1,6 +1,8 @@
 (function () {
   const DEFAULT_CENTER = [127.0276, 37.4979];
   const DEFAULT_ZOOM = 11;
+  const MAP_HISTORY_LIMIT = 50000;
+  const HISTORY_PAGE_SIZE = 300;
   const HEALTH_CHECK_INTERVAL_MS = 5000;
   const HEALTH_TIMEOUT_MS = 45000;
   const PATH_SOURCE_ID = 'magwalk-location-path-source';
@@ -56,6 +58,7 @@
   const presetButtons = Array.from(document.querySelectorAll('[data-range-preset]'));
   const locationLog = document.querySelector('#locationLog');
   const historyEmpty = document.querySelector('#historyEmpty');
+  const loadMoreHistoryButton = document.querySelector('#loadMoreHistoryButton');
   const pathCount = document.querySelector('#pathCount');
   const permissionIndicator = document.querySelector('#permissionIndicator');
   const runningIndicator = document.querySelector('#runningIndicator');
@@ -74,6 +77,8 @@
   let healthTimerId = null;
   let lastHealthyAt = 0;
   let geolocationPermissionStatus = null;
+  let loadedHistoryLogs = [];
+  let renderedHistoryCount = 0;
   let activeFilter = {
     from: null,
     to: null,
@@ -95,7 +100,7 @@
     }).format(new Date(value));
   }
 
-  function appendLog(text, className) {
+  function appendLog(text, className, placement = 'prepend') {
     if (historyEmpty) {
       historyEmpty.hidden = true;
     }
@@ -106,6 +111,11 @@
 
     if (className) {
       item.classList.add(...className.split(' ').filter(Boolean));
+    }
+
+    if (placement === 'append') {
+      locationLog.append(item);
+      return;
     }
 
     locationLog.prepend(item);
@@ -241,7 +251,7 @@
 
   function buildLocationQuery() {
     const params = new URLSearchParams();
-    params.set('limit', '2000');
+    params.set('limit', String(MAP_HISTORY_LIMIT));
 
     if (activeFilter.from) {
       params.set('from', activeFilter.from.toISOString());
@@ -510,12 +520,19 @@
 
   function clearRenderedHistory() {
     mapState.coordinates = [];
+    loadedHistoryLogs = [];
+    renderedHistoryCount = 0;
     updatePathLayer();
     updatePathCount();
     locationLog.replaceChildren();
 
     if (historyEmpty) {
       historyEmpty.hidden = false;
+    }
+
+    if (loadMoreHistoryButton) {
+      loadMoreHistoryButton.hidden = true;
+      loadMoreHistoryButton.disabled = false;
     }
   }
 
@@ -606,6 +623,45 @@
     mapState.map.setCenter(lngLat);
   }
 
+  function formatHistoryLog(location, label) {
+    return `${formatTime(location.collectedAt)} | ${label} | lat ${formatNumber(
+      location.latitude
+    )}, lng ${formatNumber(location.longitude)}, accuracy ${formatAccuracy(location.accuracy)}`;
+  }
+
+  function refreshLoadMoreHistoryButton() {
+    if (!loadMoreHistoryButton) {
+      return;
+    }
+
+    const remainingCount = Math.max(loadedHistoryLogs.length - renderedHistoryCount, 0);
+    loadMoreHistoryButton.hidden = remainingCount === 0;
+    loadMoreHistoryButton.disabled = remainingCount === 0;
+    loadMoreHistoryButton.querySelector('span').textContent = `Show ${Math.min(
+      HISTORY_PAGE_SIZE,
+      remainingCount
+    )} more`;
+  }
+
+  function renderNextHistoryPage() {
+    const nextLogs = loadedHistoryLogs.slice(
+      renderedHistoryCount,
+      renderedHistoryCount + HISTORY_PAGE_SIZE
+    );
+
+    nextLogs.forEach((location) => {
+      appendLog(formatHistoryLog(location, 'history'), 'history', 'append');
+    });
+
+    renderedHistoryCount += nextLogs.length;
+
+    if (historyEmpty) {
+      historyEmpty.hidden = renderedHistoryCount > 0;
+    }
+
+    refreshLoadMoreHistoryButton();
+  }
+
   async function loadLocationHistory() {
     const response = await fetch(`/api/location?${buildLocationQuery()}`);
 
@@ -616,16 +672,22 @@
 
     clearRenderedHistory();
     const logs = await response.json();
-    logs.reverse().forEach((location) => {
-      addLocationToMap(location, false);
-      appendLog(
-        `${formatTime(location.collectedAt)} | history | lat ${formatNumber(
-          location.latitude
-        )}, lng ${formatNumber(location.longitude)}, accuracy ${formatAccuracy(location.accuracy)}`,
-        'history'
-      );
-    });
-    setStatus(`History loaded: ${logs.length} records.`);
+    loadedHistoryLogs = logs;
+
+    logs
+      .slice()
+      .reverse()
+      .forEach((location) => {
+        addLocationToMap(location, false);
+      });
+
+    renderNextHistoryPage();
+    setStatus(
+      `Map path loaded: ${logs.length} records. History displays ${Math.min(
+        renderedHistoryCount,
+        logs.length
+      )} records.`
+    );
   }
 
   async function loadCurrentUser() {
@@ -657,12 +719,10 @@
 
     if (matchesFilter) {
       addLocationToMap(result);
-      appendLog(
-        `${formatTime(savedAt)} | DB committed | lat ${formatNumber(result.latitude)}, lng ${formatNumber(
-          result.longitude
-        )}, accuracy ${formatAccuracy(result.accuracy)}`,
-        'saved'
-      );
+      loadedHistoryLogs.unshift(result);
+      renderedHistoryCount += 1;
+      appendLog(formatHistoryLog(result, 'DB committed'), 'saved');
+      refreshLoadMoreHistoryButton();
     }
 
     setStatus('DB committed.');
@@ -743,6 +803,8 @@
   });
 
   touchGuardButton.addEventListener('click', openTouchGuard);
+
+  loadMoreHistoryButton?.addEventListener('click', renderNextHistoryPage);
 
   unlockStepButtons.forEach((button) => {
     button.addEventListener('click', () => {

@@ -19,6 +19,8 @@ const pool = new Pool({
   },
 });
 
+const LOCATION_LOG_LIMIT_MAX = 50000;
+
 async function initializeDatabase() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -300,7 +302,7 @@ async function saveLocationLogs(locationLogs, user) {
 }
 
 async function getLocationLogs(user, filters = {}) {
-  const limit = Math.min(Math.max(Number(filters.limit) || 500, 1), 2000);
+  const limit = Math.min(Math.max(Number(filters.limit) || 500, 1), LOCATION_LOG_LIMIT_MAX);
   const values = [user.id, lookupHash(user.id)];
   const dateFilters = [];
 
