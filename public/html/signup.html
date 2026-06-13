@@ -44,7 +44,10 @@
               </div>
               <p id="authStatus" class="status-text mb-0"></p>
               <div class="d-grid gap-2">
-                <button class="btn btn-primary btn-lg" type="submit">Create Account</button>
+                <button id="signupButton" class="btn btn-primary btn-lg auth-submit-button" type="submit">
+                  <span class="auth-button-label">Create Account</span>
+                  <span class="auth-button-spinner" aria-hidden="true"></span>
+                </button>
                 <a class="btn btn-outline-secondary btn-lg" href="/signin">Sign In</a>
               </div>
             </form>
