@@ -2,6 +2,8 @@
 
 - 주로 스마트폰 브라우저를 통해 위치 수집 기능을 켠 후, 산책 코스 등 걸음 이력을 확인하기 위한 웰빙 웹 목표 중
 
+<img width="786" height="858" alt="image" src="https://github.com/user-attachments/assets/8d45e804-abc5-48ac-bad2-3bf5fe926de3" />
+
 ---
 
 1. 개발 시 `.env.local` 파일에 Neon DB 주소를 복사하여 사용하였음
