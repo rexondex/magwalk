@@ -1,6 +1,6 @@
 (function () {
   const DEFAULT_CENTER = [127.0276, 37.4979];
-  const DEFAULT_ZOOM = 9;
+  const DEFAULT_ZOOM = 11;
   const MAP_HISTORY_LIMIT = 50000;
   const HISTORY_PAGE_SIZE = 300;
   const HEALTH_CHECK_INTERVAL_MS = 5000;
@@ -467,9 +467,8 @@
       return 'map container missing';
     }
 
-    return `container ${container.clientWidth}x${container.clientHeight}, canvas ${
-      canvas?.clientWidth || 0
-    }x${canvas?.clientHeight || 0}`;
+    return `container ${container.clientWidth}x${container.clientHeight}, canvas ${canvas?.clientWidth || 0
+      }x${canvas?.clientHeight || 0}`;
   }
 
   function ensurePathLayer() {
