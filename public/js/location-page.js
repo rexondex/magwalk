@@ -43,7 +43,6 @@
   const stopButton = document.querySelector('#stopButton');
   const touchGuardButton = document.querySelector('#touchGuardButton');
   const signoutButton = document.querySelector('#signoutButton');
-  const permissionStatus = document.querySelector('#permissionStatus');
   const noticeLog = document.querySelector('#noticeLog');
   const noticeLogEmpty = document.querySelector('#noticeLogEmpty');
   const accountName = document.querySelector('#accountName');
@@ -161,7 +160,6 @@
   }
 
   function setStatus(message) {
-    permissionStatus.textContent = message;
     appendNotice(message);
   }
 
@@ -976,7 +974,7 @@
   }
 
   bootMapAfterLayout();
-  appendNotice(permissionStatus.textContent.trim());
+  appendNotice('Waiting for browser location permission.');
   refreshUnlockSteps();
   populateHourSelects();
   updatePresetButtons();

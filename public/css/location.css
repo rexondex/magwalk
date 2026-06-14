@@ -170,14 +170,6 @@
   margin: 0 auto 12px;
 }
 
-.dashboard-panel .status-text {
-  margin: 0 0 8px;
-  border: 1px solid var(--magwalk-line);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  padding: 10px 12px;
-}
-
 .history-filter {
   display: grid;
   gap: 8px;
