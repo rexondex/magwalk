@@ -148,14 +148,14 @@
 
   function formatDistance(meters) {
     if (!Number.isFinite(meters) || meters <= 0) {
-      return '0 m';
+      return '0m';
     }
 
     if (meters < 1000) {
-      return `${Math.round(meters)} m`;
+      return `${Math.round(meters)}m`;
     }
 
-    return `${(meters / 1000).toFixed(meters >= 10000 ? 1 : 2)} km`;
+    return `${(meters / 1000).toFixed(meters >= 10000 ? 1 : 2)}km`;
   }
 
   function formatSpeed(kilometersPerHour) {
@@ -163,11 +163,29 @@
       return '-';
     }
 
-    return `${kilometersPerHour.toFixed(kilometersPerHour >= 10 ? 1 : 2)} km/h`;
+    return kilometersPerHour.toFixed(kilometersPerHour >= 10 ? 1 : 2);
   }
 
   function formatInteger(value) {
-    return new Intl.NumberFormat('ko-KR').format(Math.max(Math.round(value) || 0, 0));
+    return formatCompactNumber(value);
+  }
+
+  function formatCompactNumber(value) {
+    const numberValue = Math.max(Math.round(Number(value) || 0), 0);
+    const suffixes = [
+      { threshold: 1000000000, suffix: 'b' },
+      { threshold: 1000000, suffix: 'm' },
+      { threshold: 1000, suffix: 'k' },
+    ];
+    const suffix = suffixes.find((item) => numberValue >= item.threshold);
+
+    if (!suffix) {
+      return String(numberValue);
+    }
+
+    const compactValue = numberValue / suffix.threshold;
+    const fractionDigits = compactValue < 10 ? 1 : 0;
+    return `${compactValue.toFixed(fractionDigits).replace(/\.0$/, '')}${suffix.suffix}`;
   }
 
   function distanceMeters(from, to) {
@@ -337,7 +355,8 @@
 
     const queuedCount = Number(count) || 0;
     queueIndicator.hidden = queuedCount === 0;
-    queueCount.textContent = `${queuedCount} queued`;
+    queueIndicator.setAttribute('aria-label', `${queuedCount} queued locations`);
+    queueCount.textContent = formatCompactNumber(queuedCount);
   }
 
   function setPermitHighlight(isPermitted) {
@@ -827,7 +846,9 @@
   }
 
   function updatePathCount() {
-    pathCount.textContent = `${mapState.coordinates.length} points`;
+    const pointCount = mapState.coordinates.length;
+    pathCount.textContent = formatCompactNumber(pointCount);
+    pathCount.closest('.path-count')?.setAttribute('aria-label', `${pointCount} path points`);
   }
 
   function updateRouteStats() {
@@ -839,6 +860,15 @@
     distanceStat.textContent = formatDistance(stats.distanceMeters);
     averageSpeedStat.textContent = formatSpeed(stats.averageSpeedKmh);
     stepCountStat.textContent = formatInteger(stats.estimatedSteps);
+    distanceStat.closest('.route-stat')?.setAttribute('aria-label', `Distance ${formatDistance(stats.distanceMeters)}`);
+    averageSpeedStat.closest('.route-stat')?.setAttribute(
+      'aria-label',
+      `Average speed ${stats.averageSpeedKmh.toFixed(2)} kilometers per hour`
+    );
+    stepCountStat.closest('.route-stat')?.setAttribute(
+      'aria-label',
+      `${Math.round(stats.estimatedSteps) || 0} estimated steps`
+    );
   }
 
   function addLocationToMap(location, shouldPan = true) {
