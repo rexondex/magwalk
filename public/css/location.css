@@ -70,6 +70,30 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+.install-button {
+  position: relative;
+}
+
+.install-button[hidden] {
+  display: none;
+}
+
+.install-button.is-ready {
+  border-color: rgba(34, 211, 238, 0.58);
+  color: #f8fafc;
+}
+
+.install-button.is-ready::after {
+  content: "";
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #22d3ee;
+}
+
 .action-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -359,6 +383,34 @@
   font-size: 12px;
   font-weight: 800;
   padding: 0 10px;
+}
+
+.queue-indicator {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(34, 211, 238, 0.42);
+  border-radius: 999px;
+  background: rgba(34, 211, 238, 0.1);
+  color: #e0f2fe;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 10px;
+}
+
+.queue-indicator[hidden] {
+  display: none;
+}
+
+.queue-indicator svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .running-spinner {

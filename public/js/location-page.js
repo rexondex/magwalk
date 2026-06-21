@@ -42,6 +42,7 @@
   const startButton = document.querySelector('#startButton');
   const stopButton = document.querySelector('#stopButton');
   const touchGuardButton = document.querySelector('#touchGuardButton');
+  const installAppButton = document.querySelector('#installAppButton');
   const signoutButton = document.querySelector('#signoutButton');
   const noticeLog = document.querySelector('#noticeLog');
   const noticeLogEmpty = document.querySelector('#noticeLogEmpty');
@@ -64,6 +65,8 @@
   const pathCount = document.querySelector('#pathCount');
   const permissionIndicator = document.querySelector('#permissionIndicator');
   const runningIndicator = document.querySelector('#runningIndicator');
+  const queueIndicator = document.querySelector('#queueIndicator');
+  const queueCount = document.querySelector('#queueCount');
   const touchGuard = document.querySelector('#touchGuard');
   const unlockStepButtons = Array.from(document.querySelectorAll('[data-unlock-step]'));
 
@@ -163,8 +166,58 @@
     appendNotice(message);
   }
 
+  function refreshInstallButton() {
+    if (!installAppButton) {
+      return;
+    }
+
+    const pwa = window.MagwalkPWA;
+    const isInstalled = pwa?.isStandalone?.() || false;
+    installAppButton.hidden = isInstalled;
+    installAppButton.classList.toggle('is-ready', pwa?.canPromptInstall?.() || false);
+    installAppButton.disabled = isInstalled;
+  }
+
+  async function handleInstallClick() {
+    const pwa = window.MagwalkPWA;
+
+    if (!pwa) {
+      setStatus('PWA install is not ready in this browser yet.');
+      return;
+    }
+
+    const result = await pwa.promptInstall();
+
+    if (result.outcome === 'accepted') {
+      setStatus('Magwalk app installation accepted.');
+      return;
+    }
+
+    if (result.outcome === 'installed') {
+      setStatus('Magwalk is already running as an installed app.');
+      return;
+    }
+
+    if (result.outcome === 'manual') {
+      setStatus('Install prompt is unavailable here. Use the browser menu or share menu to add Magwalk to the home screen.');
+      return;
+    }
+
+    setStatus('Magwalk app installation was dismissed.');
+  }
+
   function setRunningIndicator(isRunning) {
     runningIndicator.hidden = !isRunning;
+  }
+
+  function setQueueIndicator(count) {
+    if (!queueIndicator || !queueCount) {
+      return;
+    }
+
+    const queuedCount = Number(count) || 0;
+    queueIndicator.hidden = queuedCount === 0;
+    queueCount.textContent = `${queuedCount} queued`;
   }
 
   function setPermitHighlight(isPermitted) {
@@ -846,10 +899,17 @@
     setStatus('DB committed.');
   }
 
+  function renderQueued(location) {
+    markCollectorHealthy();
+    lastCommit.textContent = `Queued ${formatTime(location.collectedAt)}`;
+  }
+
   const collector = new window.LocationCollector({
     onStatus: setStatus,
     onLocation: renderLocation,
     onSaved: renderSaved,
+    onQueued: renderQueued,
+    onQueueUpdate: setQueueIndicator,
     onError: setStatus,
     onPermission: setPermitHighlight,
   });
@@ -926,6 +986,10 @@
 
   touchGuardButton.addEventListener('click', openTouchGuard);
 
+  installAppButton?.addEventListener('click', () => {
+    handleInstallClick().finally(refreshInstallButton);
+  });
+
   loadMoreHistoryButton?.addEventListener('click', renderNextHistoryPage);
 
   unlockStepButtons.forEach((button) => {
@@ -948,6 +1012,7 @@
     setRunningIndicator(false);
     await releaseWakeLock('collect');
     await releaseWakeLock('touch-guard');
+    window.MagwalkPWA?.clearPrivateCache?.();
     await fetch('/api/signout', { method: 'POST' });
     window.location.href = '/';
   });
@@ -963,10 +1028,22 @@
 
   window.addEventListener('load', resizeMap);
   window.addEventListener('resize', resizeMap);
+  window.addEventListener('magwalk:pwa-install-ready', refreshInstallButton);
+  window.addEventListener('magwalk:pwa-install-changed', refreshInstallButton);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && wakeLockReasons.size) {
       requestWakeLock(wakeLockReasons.values().next().value);
     }
+  });
+
+  navigator.serviceWorker?.addEventListener('message', (event) => {
+    if (event.data?.type !== 'MAGWALK_LOCATION_QUEUE_FLUSHED') {
+      return;
+    }
+
+    setQueueIndicator(0);
+    setStatus(`Background sync saved ${event.data.count} queued locations.`);
+    loadLocationHistory();
   });
 
   if ('ResizeObserver' in window) {
@@ -975,12 +1052,14 @@
 
   bootMapAfterLayout();
   appendNotice('Waiting for browser location permission.');
+  refreshInstallButton();
   refreshUnlockSteps();
   populateHourSelects();
   updatePresetButtons();
   refreshPermissionState();
   loadCurrentUser().then((isSignedIn) => {
     if (isSignedIn) {
+      collector.flushQueuedLocations();
       loadLocationHistory();
     }
   });

@@ -299,6 +299,7 @@ async function saveLocationLogs(locationLogs, user) {
         collected_at
       )
       VALUES ${placeholders.join(', ')}
+      ON CONFLICT (id) DO NOTHING
       RETURNING
         id,
         user_id AS "userId",

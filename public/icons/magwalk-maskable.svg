@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Magwalk">
+  <rect width="512" height="512" fill="#05070b"/>
+  <path d="M156 160c38-42 89-53 140-34 50 19 84 64 92 127 6 53-14 97-60 131-44 32-101 39-152 17" fill="none" stroke="#f8fafc" stroke-width="44" stroke-linecap="round"/>
+  <path d="M142 278l71-68 53 90 51-55 57 70" fill="none" stroke="#22d3ee" stroke-width="35" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="164" cy="364" r="24" fill="#d946ef"/>
+  <circle cx="384" cy="160" r="20" fill="#f8fafc"/>
+</svg>

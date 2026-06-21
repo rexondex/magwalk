@@ -4,6 +4,17 @@ const { getLocationLogs, saveLocationLogs } = require('../db/db');
 const { requireAuth } = require('./session');
 
 const router = express.Router();
+const LOCATION_BATCH_LIMIT = 1000;
+
+function normalizeLocationId(id) {
+  const value = String(id || '').trim();
+
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)) {
+    return value;
+  }
+
+  return crypto.randomUUID();
+}
 
 function normalizeLocationPayload(payload) {
   const latitude = Number(payload.latitude);
@@ -16,7 +27,7 @@ function normalizeLocationPayload(payload) {
   }
 
   return {
-    id: crypto.randomUUID(),
+    id: normalizeLocationId(payload.id),
     latitude,
     longitude,
     accuracy: Number.isFinite(accuracy) ? accuracy : null,
@@ -45,6 +56,19 @@ function normalizeLocationFilters(query) {
   };
 }
 
+function normalizeLocationBatchPayload(payload) {
+  const locations = Array.isArray(payload) ? payload : payload.locations;
+
+  if (!Array.isArray(locations)) {
+    return null;
+  }
+
+  return locations
+    .slice(0, LOCATION_BATCH_LIMIT)
+    .map((location) => normalizeLocationPayload(location || {}))
+    .filter(Boolean);
+}
+
 router.get('/api/location', requireAuth, async (req, res, next) => {
   try {
     const filters = normalizeLocationFilters(req.query || {});
@@ -69,7 +93,25 @@ router.post('/api/location', requireAuth, async (req, res, next) => {
     }
 
     const savedLocationLogs = await saveLocationLogs([locationLog], req.user);
-    return res.status(201).json(savedLocationLogs[0]);
+    return res.status(savedLocationLogs[0] ? 201 : 200).json(savedLocationLogs[0] || locationLog);
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.post('/api/location/bulk', requireAuth, async (req, res, next) => {
+  try {
+    const locationLogs = normalizeLocationBatchPayload(req.body || {});
+
+    if (!locationLogs || !locationLogs.length) {
+      return res.status(400).json({ message: 'valid location records are required.' });
+    }
+
+    const savedLocationLogs = await saveLocationLogs(locationLogs, req.user);
+    return res.status(201).json({
+      saved: savedLocationLogs,
+      acceptedIds: locationLogs.map((locationLog) => locationLog.id),
+    });
   } catch (error) {
     return next(error);
   }

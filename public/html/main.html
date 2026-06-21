@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Main - Magwalk</title>
+    <meta name="application-name" content="Magwalk" />
+    <meta name="theme-color" content="#05070b" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Magwalk" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="stylesheet" href="/vendor/bootstrap/bootstrap.min.css" />
     <link href="/vendor/maplibre-gl/maplibre-gl.css?v=local" rel="stylesheet" />
     <link rel="stylesheet" href="/css/base.css" />
@@ -19,6 +26,19 @@
           </div>
           <div class="account-bar">
             <span class="account-chip" id="accountName">-</span>
+            <button
+              id="installAppButton"
+              class="icon-button install-button"
+              type="button"
+              aria-label="Install Magwalk app"
+              title="Install app"
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M12 3v12"></path>
+                <path d="m7 10 5 5 5-5"></path>
+                <path d="M5 21h14"></path>
+              </svg>
+            </button>
             <button
               id="noticeLogButton"
               class="icon-button"
@@ -181,6 +201,13 @@
               <span class="running-spinner" aria-hidden="true"></span>
               <span>Running</span>
             </span>
+            <span id="queueIndicator" class="queue-indicator" hidden>
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M21 12a9 9 0 1 1-3-6.7"></path>
+                <path d="M21 3v6h-6"></path>
+              </svg>
+              <span id="queueCount">0 queued</span>
+            </span>
             <span class="path-count" id="pathCount">0 points</span>
           </div>
         </div>
@@ -247,6 +274,7 @@
 
     <script src="/vendor/maplibre-gl/maplibre-gl.js?v=local"></script>
     <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/js/pwa.js"></script>
     <script src="/js/location-collector.js"></script>
     <script src="/js/location-page.js"></script>
   </body>

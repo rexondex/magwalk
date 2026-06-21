@@ -9,6 +9,21 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use((req, res, next) => {
+  res.setHeader('Permissions-Policy', 'geolocation=(self)');
+
+  if (req.path === '/sw.js') {
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Service-Worker-Allowed', '/');
+  }
+
+  if (req.path === '/manifest.webmanifest') {
+    res.setHeader('Cache-Control', 'no-cache');
+    res.type('application/manifest+json');
+  }
+
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(pageRoutes);
