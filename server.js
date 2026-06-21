@@ -8,7 +8,7 @@ const pageRoutes = require('./route/pageRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 app.use((req, res, next) => {
   res.setHeader('Permissions-Policy', 'geolocation=(self)');
 

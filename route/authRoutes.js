@@ -12,7 +12,14 @@ function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
 
 function verifyPassword(password, salt, expectedHash) {
   const { hash } = hashPassword(password, salt);
-  return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(expectedHash, 'hex'));
+  const hashBuffer = Buffer.from(hash, 'hex');
+  const expectedHashBuffer = Buffer.from(expectedHash, 'hex');
+
+  if (hashBuffer.length !== expectedHashBuffer.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(hashBuffer, expectedHashBuffer);
 }
 
 function normalizeUsername(username) {

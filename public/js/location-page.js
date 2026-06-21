@@ -94,19 +94,49 @@
     preset: null,
   };
 
+  function isValidLocation(location) {
+    if (!location) {
+      return false;
+    }
+
+    const latitudeValue = Number(location.latitude);
+    const longitudeValue = Number(location.longitude);
+    const collectedTime = new Date(location.collectedAt).getTime();
+
+    return (
+      Number.isFinite(latitudeValue) &&
+      Number.isFinite(longitudeValue) &&
+      latitudeValue >= -90 &&
+      latitudeValue <= 90 &&
+      longitudeValue >= -180 &&
+      longitudeValue <= 180 &&
+      !Number.isNaN(collectedTime)
+    );
+  }
+
   function formatNumber(value) {
-    return Number(value).toFixed(6);
+    const numberValue = Number(value);
+    return Number.isFinite(numberValue) ? numberValue.toFixed(6) : '-';
   }
 
   function formatAccuracy(value) {
-    return value === null || value === undefined ? '-' : `${Math.round(value)}m`;
+    const numberValue = Number(value);
+    return value === null || value === undefined || !Number.isFinite(numberValue)
+      ? '-'
+      : `${Math.round(numberValue)}m`;
   }
 
   function formatTime(value) {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return '-';
+    }
+
     return new Intl.DateTimeFormat('ko-KR', {
       dateStyle: 'short',
       timeStyle: 'medium',
-    }).format(new Date(value));
+    }).format(date);
   }
 
   function appendLog(text, className, placement = 'prepend') {
@@ -186,7 +216,14 @@
       return;
     }
 
-    const result = await pwa.promptInstall();
+    let result;
+
+    try {
+      result = await pwa.promptInstall();
+    } catch (error) {
+      setStatus(`Install prompt failed: ${error.message}`);
+      return;
+    }
 
     if (result.outcome === 'accepted') {
       setStatus('Magwalk app installation accepted.');
@@ -369,6 +406,10 @@
 
   function locationMatchesActiveFilter(location) {
     const collectedTime = new Date(location.collectedAt).getTime();
+
+    if (Number.isNaN(collectedTime)) {
+      return false;
+    }
 
     if (activeFilter.from && collectedTime < activeFilter.from.getTime()) {
       return false;
@@ -713,13 +754,12 @@
       return;
     }
 
-    const latitudeValue = Number(location.latitude);
-    const longitudeValue = Number(location.longitude);
-
-    if (!Number.isFinite(latitudeValue) || !Number.isFinite(longitudeValue)) {
+    if (!isValidLocation(location)) {
       return;
     }
 
+    const latitudeValue = Number(location.latitude);
+    const longitudeValue = Number(location.longitude);
     const lngLat = [longitudeValue, latitudeValue];
     mapState.coordinates.push(lngLat);
     mapState.marker.setLngLat(lngLat);
@@ -745,6 +785,7 @@
     }
 
     mapState.coordinates = locations
+      .filter(isValidLocation)
       .map((location) => {
         const latitudeValue = Number(location.latitude);
         const longitudeValue = Number(location.longitude);
@@ -827,6 +868,11 @@
         return;
       }
 
+      if (response.status === 401) {
+        handleAuthExpired();
+        return;
+      }
+
       if (!response.ok) {
         setStatus('Failed to load filtered location history.');
         return;
@@ -839,14 +885,19 @@
         return;
       }
 
-      loadedHistoryLogs = logs;
-      setMapLocations(logs.slice().reverse());
+      if (!Array.isArray(logs)) {
+        setStatus('Location history response was invalid.');
+        return;
+      }
+
+      loadedHistoryLogs = logs.filter(isValidLocation);
+      setMapLocations(loadedHistoryLogs.slice().reverse());
 
       renderNextHistoryPage();
       setStatus(
-        `Map path loaded: ${logs.length} records. History displays ${Math.min(
+        `Map path loaded: ${loadedHistoryLogs.length} records. History displays ${Math.min(
           renderedHistoryCount,
-          logs.length
+          loadedHistoryLogs.length
         )} records.`
       );
     } catch (error) {
@@ -862,7 +913,14 @@
   }
 
   async function loadCurrentUser() {
-    const response = await fetch('/api/me');
+    let response;
+
+    try {
+      response = await fetch('/api/me');
+    } catch (error) {
+      setStatus(`Unable to verify sign-in: ${error.message}`);
+      return false;
+    }
 
     if (!response.ok) {
       window.location.href = '/signin';
@@ -875,6 +933,11 @@
   }
 
   function renderLocation(location) {
+    if (!isValidLocation(location)) {
+      setStatus('Ignored invalid location update.');
+      return;
+    }
+
     markCollectorHealthy();
     latitude.textContent = formatNumber(location.latitude);
     longitude.textContent = formatNumber(location.longitude);
@@ -883,6 +946,11 @@
   }
 
   function renderSaved(result) {
+    if (!isValidLocation(result)) {
+      setStatus('Ignored invalid DB commit response.');
+      return;
+    }
+
     markCollectorHealthy();
     const savedAt = result.collectedAt || new Date();
     const matchesFilter = locationMatchesActiveFilter(result);
@@ -900,8 +968,24 @@
   }
 
   function renderQueued(location) {
+    if (!isValidLocation(location)) {
+      return;
+    }
+
     markCollectorHealthy();
     lastCommit.textContent = `Queued ${formatTime(location.collectedAt)}`;
+  }
+
+  function handleAuthExpired() {
+    collector.stop();
+    stopHealthWatchdog();
+    setRunningIndicator(false);
+    startButton.disabled = false;
+    stopButton.disabled = true;
+    setStatus('Sign-in expired. Please sign in again to continue location collection.');
+    window.setTimeout(() => {
+      window.location.href = '/signin';
+    }, 1200);
   }
 
   const collector = new window.LocationCollector({
@@ -912,6 +996,7 @@
     onQueueUpdate: setQueueIndicator,
     onError: setStatus,
     onPermission: setPermitHighlight,
+    onAuthExpired: handleAuthExpired,
   });
 
   permissionButton.addEventListener('click', () => {
@@ -1013,8 +1098,13 @@
     await releaseWakeLock('collect');
     await releaseWakeLock('touch-guard');
     window.MagwalkPWA?.clearPrivateCache?.();
-    await fetch('/api/signout', { method: 'POST' });
-    window.location.href = '/';
+    try {
+      await fetch('/api/signout', { method: 'POST' });
+    } catch (error) {
+      setStatus(`Sign out request failed: ${error.message}`);
+    } finally {
+      window.location.href = '/';
+    }
   });
 
   function bootMapAfterLayout() {

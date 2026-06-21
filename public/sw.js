@@ -161,14 +161,29 @@ async function flushQueuedLocations() {
       throw new Error('Location queue sync failed.');
     }
 
-    sentIds.push(...batch.map((record) => record.id));
+    const result = await safeJson(response);
+    const acceptedIds = Array.isArray(result.acceptedIds) ? result.acceptedIds : [];
+    const rejectedIds = Array.isArray(result.rejectedIds) ? result.rejectedIds : [];
+    const deletableIds = [...acceptedIds, ...rejectedIds].filter((id) =>
+      batch.some((record) => record.id === id)
+    );
+
+    sentIds.push(...(deletableIds.length ? deletableIds : batch.map((record) => record.id)));
   }
 
-  await deleteQueuedLocations(db, sentIds);
+  await deleteQueuedLocations(db, [...new Set(sentIds)]);
   await notifyClients({
     type: 'MAGWALK_LOCATION_QUEUE_FLUSHED',
     count: sentIds.length
   });
+}
+
+async function safeJson(response) {
+  try {
+    return await response.json();
+  } catch (error) {
+    return {};
+  }
 }
 
 function openLocationDb() {

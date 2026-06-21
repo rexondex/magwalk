@@ -10,7 +10,11 @@ function parseCookies(cookieHeader = '') {
     const [rawName, ...rawValue] = item.trim().split('=');
 
     if (rawName) {
-      cookies[rawName] = decodeURIComponent(rawValue.join('='));
+      try {
+        cookies[rawName] = decodeURIComponent(rawValue.join('='));
+      } catch (error) {
+        cookies[rawName] = rawValue.join('=');
+      }
     }
 
     return cookies;
