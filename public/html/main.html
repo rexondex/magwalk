@@ -95,6 +95,24 @@
             </svg>
             <span>History</span>
           </button>
+          <button
+            id="dailySummaryButton"
+            class="action-button action-muted"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#dailySummaryModal"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+              <path d="M16 2v4"></path>
+              <path d="M8 2v4"></path>
+              <path d="M3 10h18"></path>
+              <path d="M8 15h.01"></path>
+              <path d="M12 15h.01"></path>
+              <path d="M16 15h.01"></path>
+            </svg>
+            <span>Daily</span>
+          </button>
           <button id="touchGuardButton" class="action-button action-muted" type="button">
             <svg aria-hidden="true" viewBox="0 0 24 24">
               <rect x="5" y="11" width="14" height="9" rx="2"></rect>
@@ -265,6 +283,116 @@
                 </svg>
                 <span>Show 300 more</span>
               </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="dailySummaryModal" tabindex="-1" aria-labelledby="dailySummaryModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable daily-modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <div>
+                <p class="eyebrow mb-1">Magwalk</p>
+                <h2 class="modal-title h5 fw-bold" id="dailySummaryModalTitle">Daily Achievement</h2>
+              </div>
+              <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body daily-modal-body">
+              <div class="daily-summary-layout">
+                <section class="daily-calendar-panel" aria-label="Daily achievement calendar">
+                  <div class="daily-date-controls">
+                    <label>
+                      <span>Day</span>
+                      <input id="dailyDateInput" type="date" />
+                    </label>
+                    <button id="dailyTodayButton" class="daily-control-button" type="button">Today</button>
+                  </div>
+
+                  <div class="daily-month-header">
+                    <button id="dailyPreviousMonthButton" class="icon-button" type="button" aria-label="Previous month">
+                      <svg aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="m15 18-6-6 6-6"></path>
+                      </svg>
+                    </button>
+                    <strong id="dailyMonthTitle">-</strong>
+                    <button id="dailyNextMonthButton" class="icon-button" type="button" aria-label="Next month">
+                      <svg aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="m9 18 6-6-6-6"></path>
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div id="dailyCalendarGrid" class="daily-calendar-grid" aria-label="Dates with Magwalk data"></div>
+
+                  <div class="daily-export-actions">
+                    <button id="dailyShareButton" class="daily-control-button daily-share-button" type="button">
+                      <svg aria-hidden="true" viewBox="0 0 24 24">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <path d="m8.6 13.5 6.8 4"></path>
+                        <path d="m15.4 6.5-6.8 4"></path>
+                      </svg>
+                      <span>Share</span>
+                    </button>
+                    <button id="dailyDownloadButton" class="daily-control-button daily-download-button" type="button">
+                      <svg aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="M12 3v12"></path>
+                        <path d="m7 10 5 5 5-5"></path>
+                        <path d="M5 21h14"></path>
+                      </svg>
+                      <span>PNG</span>
+                    </button>
+                  </div>
+
+                  <div id="dailyDetailGrid" class="daily-detail-grid" aria-label="Daily detailed statistics"></div>
+                  <p id="dailySummaryStatus" class="daily-summary-status">오늘 하루 기록을 준비합니다.</p>
+                </section>
+
+                <section class="daily-achievement-preview" aria-label="Square daily achievement preview">
+                  <div id="dailyAchievementCard" class="daily-achievement-card">
+                    <div class="daily-card-topline">
+                      <span>MAGWALK</span>
+                      <span id="dailyCardDate">-</span>
+                    </div>
+                    <div class="daily-card-main">
+                      <p id="dailyCardKicker">Daily route</p>
+                      <h3 id="dailyCardTitle">하루 성과</h3>
+                      <p id="dailyCardSubtitle">00:00-24:00 기준 요약</p>
+                    </div>
+                    <div class="daily-route-frame">
+                      <svg id="dailyRoutePreview" viewBox="0 0 320 160" role="img" aria-label="Daily route preview">
+                        <path id="dailyRoutePath" d="" pathLength="100"></path>
+                        <circle id="dailyRouteStart" cx="0" cy="0" r="0"></circle>
+                        <circle id="dailyRouteEnd" cx="0" cy="0" r="0"></circle>
+                      </svg>
+                    </div>
+                    <div class="daily-card-stats">
+                      <div>
+                        <span>Distance</span>
+                        <strong id="dailyCardDistance">0m</strong>
+                      </div>
+                      <div>
+                        <span>Steps</span>
+                        <strong id="dailyCardSteps">0</strong>
+                      </div>
+                      <div>
+                        <span>Avg pace</span>
+                        <strong id="dailyCardPace">-</strong>
+                      </div>
+                      <div>
+                        <span>Moving</span>
+                        <strong id="dailyCardMoving">0m</strong>
+                      </div>
+                    </div>
+                    <div class="daily-card-footer">
+                      <span id="dailyCardTimeRange">No records</span>
+                      <span id="dailyCardPointCount">0 points</span>
+                    </div>
+                  </div>
+                </section>
+              </div>
             </div>
           </div>
         </div>

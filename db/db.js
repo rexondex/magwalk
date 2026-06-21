@@ -358,6 +358,39 @@ async function getLocationLogs(user, filters = {}) {
   return result.rows.map(hydrateLocationLog);
 }
 
+async function getLocationLogDayCounts(user, filters = {}) {
+  const offsetMinutes = Math.min(Math.max(Number(filters.timezoneOffsetMinutes) || 0, -840), 840);
+  const values = [user.id, lookupHash(user.id), Math.trunc(offsetMinutes)];
+  const dateFilters = [];
+  const localDayExpression = `(collected_at - ($3::int * INTERVAL '1 minute'))::date`;
+
+  if (filters.from) {
+    values.push(filters.from);
+    dateFilters.push(`collected_at >= $${values.length}`);
+  }
+
+  if (filters.to) {
+    values.push(filters.to);
+    dateFilters.push(`collected_at < $${values.length}`);
+  }
+
+  const result = await pool.query(
+    `
+      SELECT
+        TO_CHAR(${localDayExpression}, 'YYYY-MM-DD') AS date,
+        COUNT(*)::int AS count
+      FROM location_logs
+      WHERE (user_id = $1 OR owner_lookup = $2)
+        ${dateFilters.length ? `AND ${dateFilters.join(' AND ')}` : ''}
+      GROUP BY ${localDayExpression}
+      ORDER BY ${localDayExpression} ASC
+    `,
+    values
+  );
+
+  return result.rows;
+}
+
 async function createSession(token, user, expiresAt) {
   await pool.query(
     `
@@ -415,6 +448,7 @@ module.exports = {
   deleteSession,
   findUserByUsername,
   findSessionUser,
+  getLocationLogDayCounts,
   getLocationLogs,
   initializeDatabase,
   saveLocationLogs,

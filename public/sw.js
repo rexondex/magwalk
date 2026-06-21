@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'magwalk-pwa-v1';
+const CACHE_VERSION = 'magwalk-pwa-v2';
 const APP_CACHE = `${CACHE_VERSION}-app`;
 const LOCATION_SYNC_TAG = 'magwalk-location-sync';
 const LOCATION_DB_NAME = 'magwalk-location-queue';

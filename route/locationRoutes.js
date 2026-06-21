@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const express = require('express');
-const { getLocationLogs, saveLocationLogs } = require('../db/db');
+const { getLocationLogDayCounts, getLocationLogs, saveLocationLogs } = require('../db/db');
 const { requireAuth } = require('./session');
 
 const router = express.Router();
@@ -109,6 +109,36 @@ function normalizeLocationFilters(query) {
   };
 }
 
+function normalizeDayCountFilters(query) {
+  const from = query.from ? new Date(query.from) : null;
+  const to = query.to ? new Date(query.to) : null;
+  const timezoneOffsetMinutes = query.timezoneOffsetMinutes
+    ? Number(query.timezoneOffsetMinutes)
+    : 0;
+
+  if ((from && Number.isNaN(from.getTime())) || (to && Number.isNaN(to.getTime()))) {
+    return null;
+  }
+
+  if (from && to && from >= to) {
+    return null;
+  }
+
+  if (
+    !Number.isFinite(timezoneOffsetMinutes) ||
+    timezoneOffsetMinutes < -840 ||
+    timezoneOffsetMinutes > 840
+  ) {
+    return null;
+  }
+
+  return {
+    from: from ? from.toISOString() : null,
+    to: to ? to.toISOString() : null,
+    timezoneOffsetMinutes: Math.trunc(timezoneOffsetMinutes),
+  };
+}
+
 function normalizeLocationBatchPayload(payload) {
   const locations = Array.isArray(payload) ? payload : payload.locations;
 
@@ -139,6 +169,21 @@ function normalizeLocationBatchPayload(payload) {
     truncatedCount: Math.max(locations.length - LOCATION_BATCH_LIMIT, 0),
   };
 }
+
+router.get('/api/location/days', requireAuth, async (req, res, next) => {
+  try {
+    const filters = normalizeDayCountFilters(req.query || {});
+
+    if (!filters) {
+      return res.status(400).json({ message: 'Invalid daily calendar filter.' });
+    }
+
+    const dayCounts = await getLocationLogDayCounts(req.user, filters);
+    return res.json(dayCounts);
+  } catch (error) {
+    return next(error);
+  }
+});
 
 router.get('/api/location', requireAuth, async (req, res, next) => {
   try {
