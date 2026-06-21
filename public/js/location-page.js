@@ -6,6 +6,9 @@
   const HISTORY_PAGE_SIZE = 300;
   const HEALTH_CHECK_INTERVAL_MS = 5000;
   const HEALTH_TIMEOUT_MS = 45000;
+  const ROUTE_GAP_LIMIT_MS = 10 * 60 * 1000;
+  const MAX_ROUTE_SEGMENT_SPEED_MPS = 15;
+  const ESTIMATED_STEP_LENGTH_METERS = 0.74;
   const PATH_SOURCE_ID = 'magwalk-location-path-source';
   const PATH_LAYER_ID = 'magwalk-location-path-layer';
   const START_POINT_SOURCE_ID = 'magwalk-location-start-point-source';
@@ -62,6 +65,9 @@
   const locationLog = document.querySelector('#locationLog');
   const historyEmpty = document.querySelector('#historyEmpty');
   const loadMoreHistoryButton = document.querySelector('#loadMoreHistoryButton');
+  const distanceStat = document.querySelector('#distanceStat');
+  const averageSpeedStat = document.querySelector('#averageSpeedStat');
+  const stepCountStat = document.querySelector('#stepCountStat');
   const pathCount = document.querySelector('#pathCount');
   const permissionIndicator = document.querySelector('#permissionIndicator');
   const runningIndicator = document.querySelector('#runningIndicator');
@@ -74,6 +80,7 @@
     map: null,
     marker: null,
     coordinates: [],
+    locations: [],
   };
 
   const wakeLockReasons = new Set();
@@ -137,6 +144,82 @@
       dateStyle: 'short',
       timeStyle: 'medium',
     }).format(date);
+  }
+
+  function formatDistance(meters) {
+    if (!Number.isFinite(meters) || meters <= 0) {
+      return '0 m';
+    }
+
+    if (meters < 1000) {
+      return `${Math.round(meters)} m`;
+    }
+
+    return `${(meters / 1000).toFixed(meters >= 10000 ? 1 : 2)} km`;
+  }
+
+  function formatSpeed(kilometersPerHour) {
+    if (!Number.isFinite(kilometersPerHour) || kilometersPerHour <= 0) {
+      return '-';
+    }
+
+    return `${kilometersPerHour.toFixed(kilometersPerHour >= 10 ? 1 : 2)} km/h`;
+  }
+
+  function formatInteger(value) {
+    return new Intl.NumberFormat('ko-KR').format(Math.max(Math.round(value) || 0, 0));
+  }
+
+  function distanceMeters(from, to) {
+    const earthRadiusMeters = 6371000;
+    const fromLatitude = Number(from.latitude) * Math.PI / 180;
+    const toLatitude = Number(to.latitude) * Math.PI / 180;
+    const deltaLatitude = (Number(to.latitude) - Number(from.latitude)) * Math.PI / 180;
+    const deltaLongitude = (Number(to.longitude) - Number(from.longitude)) * Math.PI / 180;
+    const halfChord =
+      Math.sin(deltaLatitude / 2) * Math.sin(deltaLatitude / 2) +
+      Math.cos(fromLatitude) * Math.cos(toLatitude) *
+        Math.sin(deltaLongitude / 2) * Math.sin(deltaLongitude / 2);
+
+    return earthRadiusMeters * 2 * Math.atan2(Math.sqrt(halfChord), Math.sqrt(1 - halfChord));
+  }
+
+  function routeStatsFromLocations(locations) {
+    const validLocations = locations.filter(isValidLocation);
+    let distanceMetersTotal = 0;
+    let durationMsTotal = 0;
+
+    for (let index = 1; index < validLocations.length; index += 1) {
+      const previous = validLocations[index - 1];
+      const current = validLocations[index];
+      const previousTime = new Date(previous.collectedAt).getTime();
+      const currentTime = new Date(current.collectedAt).getTime();
+      const durationMs = currentTime - previousTime;
+
+      if (durationMs <= 0 || durationMs > ROUTE_GAP_LIMIT_MS) {
+        continue;
+      }
+
+      const segmentDistance = distanceMeters(previous, current);
+      const segmentSpeedMps = segmentDistance / (durationMs / 1000);
+
+      if (!Number.isFinite(segmentDistance) || segmentSpeedMps > MAX_ROUTE_SEGMENT_SPEED_MPS) {
+        continue;
+      }
+
+      distanceMetersTotal += segmentDistance;
+      durationMsTotal += durationMs;
+    }
+
+    const averageSpeedKmh =
+      durationMsTotal > 0 ? (distanceMetersTotal / (durationMsTotal / 1000)) * 3.6 : 0;
+    const estimatedSteps = distanceMetersTotal / ESTIMATED_STEP_LENGTH_METERS;
+
+    return {
+      averageSpeedKmh,
+      distanceMeters: distanceMetersTotal,
+      estimatedSteps,
+    };
   }
 
   function appendLog(text, className, placement = 'prepend') {
@@ -663,10 +746,12 @@
 
   function clearRenderedHistory() {
     mapState.coordinates = [];
+    mapState.locations = [];
     loadedHistoryLogs = [];
     renderedHistoryCount = 0;
     updatePathLayer();
     updatePathCount();
+    updateRouteStats();
     locationLog.replaceChildren();
 
     if (historyEmpty) {
@@ -745,6 +830,17 @@
     pathCount.textContent = `${mapState.coordinates.length} points`;
   }
 
+  function updateRouteStats() {
+    if (!distanceStat || !averageSpeedStat || !stepCountStat) {
+      return;
+    }
+
+    const stats = routeStatsFromLocations(mapState.locations);
+    distanceStat.textContent = formatDistance(stats.distanceMeters);
+    averageSpeedStat.textContent = formatSpeed(stats.averageSpeedKmh);
+    stepCountStat.textContent = formatInteger(stats.estimatedSteps);
+  }
+
   function addLocationToMap(location, shouldPan = true) {
     if (!mapState.map) {
       initMap();
@@ -762,9 +858,11 @@
     const longitudeValue = Number(location.longitude);
     const lngLat = [longitudeValue, latitudeValue];
     mapState.coordinates.push(lngLat);
+    mapState.locations.push(location);
     mapState.marker.setLngLat(lngLat);
     updatePathLayer();
     updatePathCount();
+    updateRouteStats();
 
     if (shouldPan) {
       resizeMap();
@@ -797,6 +895,7 @@
         return [longitudeValue, latitudeValue];
       })
       .filter(Boolean);
+    mapState.locations = locations.filter(isValidLocation);
 
     const lastCoordinate = mapState.coordinates[mapState.coordinates.length - 1];
 
@@ -806,6 +905,7 @@
 
     updatePathLayer();
     updatePathCount();
+    updateRouteStats();
     fitMapToPath();
   }
 

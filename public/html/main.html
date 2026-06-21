@@ -191,6 +191,20 @@
         <div class="map-header">
           <h2 class="h4 fw-bold">Path</h2>
           <div class="map-header-status">
+            <div class="route-stats" aria-label="Route statistics">
+              <span class="route-stat">
+                <span>Dist</span>
+                <strong id="distanceStat">0 m</strong>
+              </span>
+              <span class="route-stat">
+                <span>Avg</span>
+                <strong id="averageSpeedStat">-</strong>
+              </span>
+              <span class="route-stat" title="Estimated from GPS distance">
+                <span>Steps</span>
+                <strong id="stepCountStat">0</strong>
+              </span>
+            </div>
             <span id="permissionIndicator" class="permission-indicator" hidden aria-label="Location permission granted">
               <svg aria-hidden="true" viewBox="0 0 24 24">
                 <path d="M12 21s7-6.1 7-12a7 7 0 0 0-14 0c0 5.9 7 12 7 12z"></path>
