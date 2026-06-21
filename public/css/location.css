@@ -332,30 +332,28 @@
 }
 
 .map-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
+  gap: 8px;
   margin-bottom: 10px;
-}
-
-.map-header h2 {
-  margin-bottom: 0;
 }
 
 .map-header-status {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 6px;
 }
 
 .route-stats {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 6px;
+  justify-content: flex-start;
+  gap: 5px;
+  min-width: 0;
 }
 
 .route-stat {
@@ -786,14 +784,6 @@ body.touch-guard-active {
     min-height: 420px;
   }
 
-  .map-header {
-    align-items: flex-start;
-  }
-
-  .map-header-status {
-    max-width: min(100%, 520px);
-  }
-
   .log-modal-dialog {
     width: min(560px, calc(100% - 20px));
     margin-block: max(12px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-bottom));
@@ -833,12 +823,12 @@ body.touch-guard-active {
   }
 
   .map-header {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 8px;
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  .map-header-status {
-    justify-content: flex-start;
+  .route-stat,
+  .path-count,
+  .queue-indicator {
+    padding-inline: 7px;
   }
 }
